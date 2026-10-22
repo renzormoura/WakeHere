@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AcordeAqui — Protótipo interativo</title>
+<style>
+  :root, body[data-theme="light"] {
+    --page-bg: #e9ecf2;
+    --page-text: #1c1c1e;
+    --card: #ffffff;
+    --card-2: #f2f2f7;
+    --text: #1c1c1e;
+    --secondary: #8a8a8e;
+    --sep: rgba(60,60,67,.16);
+    --accent: #0a84ff;
+    --seg-bg: rgba(120,120,128,.16);
+    --field-bg: #f2f2f7;
+    --tab-bg: rgba(249,249,249,.94);
+    --map-land: #f1f0ea;
+    --map-block: #e4e2d8;
+    --map-street: #ffffff;
+    --map-park: #cfe8c8;
+    --map-water: #a9d2ef;
+    --shadow: 0 10px 30px rgba(0,0,0,.18);
+    --badge-bg: rgba(120,120,128,.12);
+  }
+  body[data-theme="dark"] {
+    --page-bg: #101114;
+    --page-text: #f2f2f7;
+    --card: #1c1c1e;
+    --card-2: #2c2c2e;
+    --text: #f2f2f7;
+    --secondary: #98989e;
+    --sep: rgba(84,84,88,.5);
+    --accent: #0a84ff;
+    --seg-bg: rgba(120,120,128,.28);
+    --field-bg: #2c2c2e;
+    --tab-bg: rgba(28,28,30,.94);
+    --map-land: #23252b;
+    --map-block: #2c2f36;
+    --map-street: #3a3e47;
+    --map-park: #274032;
+    --map-water: #1f3a52;
+    --shadow: 0 10px 30px rgba(0,0,0,.5);
+    --badge-bg: rgba(120,120,128,.24);
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  /* Garante que o atributo hidden funcione mesmo em elementos com display:flex. */
+  [hidden] { display: none !important; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--page-bg);
+    color: var(--page-text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+    min-height: 100vh;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 24px 16px 48px;
+    transition: background .25s;
+  }
+
+  .page-head {
+    width: 100%; max-width: 720px;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .page-head h1 { font-size: 20px; margin: 0; }
+  .page-head .sub { font-size: 13px; color: var(--secondary); margin-top: 2px; }
+  .theme-btn {
+    border: 1px solid var(--sep); background: var(--card); color: var(--text);
+    border-radius: 999px; padding: 8px 14px; font-size: 14px; cursor: pointer;
+  }
+
+  /* ---------- iPhone frame ---------- */
+  .phone {
+    width: 390px; height: 844px;
+    border: 12px solid #1b1b1d;
+    border-radius: 56px;
+    background: #000;
+    box-shadow: var(--shadow);
+    position: relative;
+    flex-shrink: 0;
+  }
+  .viewport {
+    position: absolute; inset: 0;
+    border-radius: 44px; overflow: hidden;
+    background: var(--card-2);
+    color: var(--text);
+  }
+  body[data-theme="dark"] .viewport { background: #000; }
+
+  /* status bar */
+  .status-bar {
+    position: absolute; top: 0; left: 0; right: 0; height: 54px;
+    z-index: 60; pointer-events: none;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 30px 0;
+    font-size: 15px; font-weight: 600; color: var(--text);
+  }
+  .status-bar.light-content { color: #fff; }
+  .island {
+    position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+    width: 122px; height: 34px; border-radius: 20px; background: #000;
+    z-index: 61; pointer-events: none;
+  }
+  .status-icons { display: flex; align-items: center; gap: 6px; }
+  .status-icons svg { display: block; }
+  .home-indicator {
+    position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+    width: 134px; height: 5px; border-radius: 3px; background: var(--text);
+    opacity: .85; z-index: 62; pointer-events: none;
+  }
+  .status-bar.light-content ~ .home-indicator { background: #fff; }
+
+  /* ---------- screens ---------- */
+  .screens { position: absolute; inset: 0; }
+  .screen {
+    position: absolute; inset: 0;
+    display: none; flex-direction: column;
+    padding-top: 54px; padding-bottom: 86px;
+    background: var(--card-2);
+  }
+  body[data-theme="dark"] .screen { background: #000; }
+  .screen.active { display: flex; }
+
+  .navbar {
+    height: 44px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+    background: var(--card-2);
+  }
+  body[data-theme="dark"] .navbar { background: #000; }
+  .nav-title { font-size: 17px; font-weight: 600; }
+  .nav-btn {
+    position: absolute; left: 12px; top: 0; height: 44px;
+    background: none; border: 0; color: var(--accent);
+    font-size: 17px; cursor: pointer; padding: 0 6px;
+  }
+  .nav-btn.right { left: auto; right: 12px; }
+
+  .scroll { flex: 1; overflow-y: auto; overscroll-behavior: contain; }
+  .scroll::-webkit-scrollbar { width: 0; }
+  .padded { padding: 12px 16px 24px; display: flex; flex-direction: column; gap: 14px; }
+
+  /* ---------- map ---------- */
+  .map-wrap {
+    position: relative; height: 250px; background: var(--map-land);
+    overflow: hidden; flex-shrink: 0;
+  }
+  .map-wrap.small { height: 230px; border-radius: 16px; }
+  .map-wrap svg { display: block; width: 100%; height: 100%; }
+  .map-hint {
+    position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%);
+    background: rgba(0,0,0,.72); color: #fff; font-size: 12px;
+    padding: 6px 12px; border-radius: 999px; pointer-events: none;
+    white-space: nowrap;
+  }
+  .map-frame { position: relative; }
+  .gps-chip {
+    position: absolute; left: 10px; top: 10px; z-index: 5;
+    background: rgba(0,0,0,.72); color: #fff; font-size: 11.5px;
+    padding: 5px 10px; border-radius: 999px; pointer-events: none;
+    max-width: 76%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .gps-chip.ok { background: rgba(29,178,74,.92); }
+  .gps-chip.err { background: rgba(255,149,0,.92); }
+  .map-locate {
+    position: absolute; right: 10px; top: 10px; z-index: 5;
+    width: 38px; height: 38px; border-radius: 50%; border: 0;
+    background: rgba(255,255,255,.95); font-size: 17px; cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,.3);
+  }
+  .map-locate:active { transform: scale(.94); }
+  .m-bg { fill: var(--map-land); }
+  .m-block { fill: var(--map-block); }
+  .m-street { stroke: var(--map-street); stroke-width: 13; fill: none; }
+  .m-street-minor { stroke: var(--map-street); stroke-width: 7; fill: none; }
+  .m-park { fill: var(--map-park); }
+  .m-water { stroke: var(--map-water); stroke-width: 16; fill: none; }
+  .m-route { stroke: var(--accent); stroke-width: 5; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .m-route-done { stroke: #34c759; stroke-width: 5; fill: none; stroke-linecap: round; }
+  .user-halo { fill: rgba(10,132,255,.25); }
+  .user-dot { fill: var(--accent); stroke: #fff; stroke-width: 2.5; }
+  .pin { fill: #ff3b30; }
+  .pin-dot { fill: #fff; }
+  .pin-shadow { fill: rgba(0,0,0,.25); }
+
+  /* ---------- form ---------- */
+  .form { padding: 14px 16px 28px; }
+  .sec-label {
+    font-size: 13px; color: var(--secondary);
+    text-transform: uppercase; letter-spacing: .4px;
+    margin: 18px 4px 7px; font-weight: 600;
+  }
+  .sec-label:first-child { margin-top: 4px; }
+  .card { background: var(--card); border-radius: 16px; overflow: hidden; }
+  .row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; padding: 12px 16px; min-height: 44px;
+    font-size: 16px;
+  }
+  .row.col { flex-direction: column; align-items: stretch; }
+  .row .val { color: var(--secondary); text-align: right; }
+  .sep { height: 1px; background: var(--sep); margin-left: 16px; }
+  .footer {
+    font-size: 13px; color: var(--secondary);
+    margin: 7px 8px 0; line-height: 1.4;
+  }
+  .field {
+    width: 100%; border: 0; background: none; color: var(--text);
+    font-size: 16px; outline: none; padding: 0;
+  }
+  .field::placeholder { color: var(--secondary); }
+  .result-row {
+    display: block; width: 100%; text-align: left;
+    background: none; border: 0; border-top: 1px solid var(--sep);
+    padding: 10px 16px; cursor: pointer; color: var(--text); font-size: 16px;
+  }
+  .result-row:hover { background: var(--seg-bg); }
+  .result-row .sub2 { display: block; font-size: 13px; color: var(--secondary); margin-top: 2px; }
+  .searching { font-size: 14px; color: var(--secondary); padding: 10px 16px; border-top: 1px solid var(--sep); }
+
+  /* segmented */
+  .seg { display: flex; background: var(--seg-bg); border-radius: 9px; padding: 2px; margin: 0 16px 12px; }
+  .seg button {
+    flex: 1; border: 0; background: none; color: var(--text);
+    font-size: 14px; font-weight: 500; padding: 6px 0;
+    border-radius: 7px; cursor: pointer;
+  }
+  .seg button.on { background: var(--card); box-shadow: 0 1px 3px rgba(0,0,0,.18); font-weight: 600; }
+
+  /* stepper */
+  .stepper {
+    display: flex; align-items: stretch;
+    background: var(--seg-bg); border-radius: 8px; overflow: hidden; flex-shrink: 0;
+  }
+  .stepper button {
+    width: 42px; border: 0; background: none; color: var(--accent);
+    font-size: 20px; cursor: pointer;
+  }
+  .stepper button:active { background: rgba(0,0,0,.08); }
+  .stepper button:disabled { color: var(--secondary); opacity: .5; }
+  .stepper .st-val {
+    min-width: 86px; display: flex; align-items: center; justify-content: center; gap: 2px;
+    background: var(--card); font-size: 15px; font-weight: 600;
+    border-left: 1px solid var(--sep); border-right: 1px solid var(--sep);
+  }
+  /* Número editável: toque para digitar (stepper de minutos e valor em km). */
+  .num-inline {
+    width: 44px; text-align: center; padding: 2px 3px;
+    font: inherit; font-size: 15px; font-weight: 700;
+    color: var(--text); background: transparent;
+    border: 1px solid transparent; border-radius: 6px; outline: none;
+    -moz-appearance: textfield; appearance: textfield;
+  }
+  .num-inline.right { width: 56px; text-align: right; }
+  .num-inline:hover { border-color: var(--sep); }
+  .num-inline:focus { border-color: var(--accent); background: var(--field-bg); }
+  .num-inline::-webkit-outer-spin-button,
+  .num-inline::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+  /* slider */
+  input[type="range"] {
+    -webkit-appearance: none; appearance: none; width: 100%;
+    height: 4px; border-radius: 2px; background: var(--seg-bg); outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: #fff; border: .5px solid rgba(0,0,0,.1);
+    box-shadow: 0 1px 4px rgba(0,0,0,.35); cursor: pointer;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: #fff; border: .5px solid rgba(0,0,0,.1);
+    box-shadow: 0 1px 4px rgba(0,0,0,.35); cursor: pointer;
+  }
+
+  /* buttons */
+  .btn {
+    width: 100%; border: 0; border-radius: 14px;
+    font-size: 17px; font-weight: 600; padding: 14px;
+    cursor: pointer; margin-top: 18px;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:disabled { opacity: .4; cursor: not-allowed; }
+  .btn-danger-outline {
+    background: var(--card); color: #ff3b30;
+    border: 1.5px solid rgba(255,59,48,.5); margin-top: 4px;
+  }
+  .btn-demo {
+    background: transparent; color: var(--secondary);
+    border: 1.5px dashed var(--sep); font-size: 14px; font-weight: 500;
+    padding: 10px; margin-top: 6px; border-radius: 12px;
+  }
+
+  /* ---------- tab bar ---------- */
+  .tab-bar {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 86px;
+    background: var(--tab-bg); backdrop-filter: blur(20px);
+    border-top: .5px solid var(--sep);
+    display: flex; z-index: 40; padding-bottom: 22px;
+  }
+  .tab-bar button {
+    flex: 1; background: none; border: 0; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 3px;
+    color: var(--secondary); font-size: 10.5px; font-weight: 500;
+    padding-top: 8px;
+  }
+  .tab-bar button.on { color: var(--accent); }
+  .tab-bar svg { width: 26px; height: 26px; }
+
+  /* ---------- covers (fullScreenCover) ---------- */
+  .cover {
+    position: absolute; inset: 0; z-index: 50;
+    background: var(--card-2);
+    display: none; flex-direction: column;
+    padding-top: 54px;
+    transform: translateY(100%);
+    transition: transform .35s cubic-bezier(.32,.72,0,1);
+  }
+  body[data-theme="dark"] .cover { background: #000; }
+  .cover.open { display: flex; transform: translateY(0); }
+  .cover .scroll { padding-bottom: 20px; }
+
+  .banner {
+    align-self: center;
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 15px; font-weight: 600;
+    padding: 8px 16px; border-radius: 999px;
+    background: rgba(10,132,255,.15); color: var(--accent);
+  }
+  .banner.red { background: rgba(255,59,48,.16); color: #ff3b30; }
+  .banner.orange { background: rgba(255,159,10,.18); color: #ff9500; }
+  .banner.blue { background: rgba(10,132,255,.15); color: #0a84ff; }
+  .banner.green { background: rgba(52,199,89,.16); color: #34c759; }
+
+  .stats { display: flex; }
+  .stat { flex: 1; text-align: center; padding: 4px 0; }
+  .stat .ico { font-size: 17px; color: var(--secondary); }
+  .stat .num { font-size: 27px; font-weight: 700; margin-top: 3px; letter-spacing: -.5px; }
+  .stat .cap { font-size: 12.5px; color: var(--secondary); margin-top: 2px; }
+  .off-route { font-size: 13px; color: #ff9500; text-align: center; padding-top: 8px; }
+
+  /* ---------- alarm ---------- */
+  .cover.alarm { background: #000; color: #fff; transform: none; transition: none; z-index: 55; }
+  .alarm-body {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    justify-content: space-between; padding: 60px 32px 60px; text-align: center;
+  }
+  .alarm-bell { font-size: 68px; line-height: 1; animation: ring .7s ease-in-out infinite alternate; }
+  @keyframes ring { from { transform: rotate(-12deg); } to { transform: rotate(12deg); } }
+  .alarm-title {
+    font-size: 46px; font-weight: 900; color: #ff453a;
+    letter-spacing: 1px; margin: 18px 0 0;
+  }
+  .alarm-sub { color: #98989e; font-size: 16px; margin-top: 26px; }
+  .alarm-dest { font-size: 23px; font-weight: 700; margin-top: 6px; }
+  .alarm-remain { color: #ffd60a; font-size: 19px; font-weight: 600; margin-top: 12px; }
+  .alarm-actions { width: 100%; display: flex; flex-direction: column; gap: 14px; }
+  .alarm-btn {
+    width: 100%; border-radius: 16px; padding: 16px;
+    font-size: 18px; font-weight: 600; cursor: pointer;
+  }
+  .alarm-stop { background: #ff453a; color: #fff; border: 0; }
+  .alarm-snooze { background: rgba(255,255,255,.12); color: #fff; border: 1px solid rgba(255,255,255,.3); }
+
+  /* ---------- lists (histórico/ajustes) ---------- */
+  .list-empty { text-align: center; padding: 70px 30px; color: var(--secondary); }
+  .list-empty .big { font-size: 44px; }
+  .list-empty .t { font-size: 19px; font-weight: 700; color: var(--text); margin-top: 12px; }
+  .list-empty .d { font-size: 14px; margin-top: 6px; line-height: 1.45; }
+
+  .hist-row { display: flex; align-items: center; gap: 10px; padding: 12px 16px; }
+  .hist-row .name { font-size: 16px; font-weight: 600; }
+  .hist-row .meta { font-size: 13px; color: var(--secondary); margin-top: 2px; }
+  .hist-row .meta2 { font-size: 12px; color: var(--secondary); margin-top: 1px; }
+  .badge {
+    flex-shrink: 0; font-size: 12px; font-weight: 600;
+    background: var(--badge-bg); color: var(--secondary);
+    padding: 5px 10px; border-radius: 999px;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .badge.green { color: #34c759; background: rgba(52,199,89,.15); }
+
+  .switch { position: relative; width: 51px; height: 31px; flex-shrink: 0; }
+  .switch input { opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; position: absolute; z-index: 2; }
+  .track {
+    position: absolute; inset: 0; border-radius: 999px;
+    background: var(--seg-bg); transition: background .2s; pointer-events: none;
+  }
+  .knob {
+    position: absolute; top: 2px; left: 2px; width: 27px; height: 27px;
+    border-radius: 50%; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,.3);
+    transition: transform .2s; pointer-events: none;
+  }
+  .switch input:checked ~ .track { background: #34c759; }
+  .switch input:checked ~ .knob { transform: translateX(20px); }
+
+  .legend {
+    max-width: 560px; margin-top: 26px;
+    font-size: 13.5px; color: var(--secondary); line-height: 1.6;
+  }
+  .legend b { color: var(--page-text); }
+
+  /* Badge de tráfego animado */
+  #trafficBadge { margin-top: 2px; margin-bottom: 2px; }
+  #trafficStatus { transition: background .4s, color .4s; font-size: 11.5px; }
+</style>
+</head>
+<body data-theme="light">
+
+<div class="page-head">
+  <div>
+    <h1>AcordeAqui — protótipo interativo</h1>
+    <div class="sub">Clique para navegar: mapa, busca, regra, viagem e alarme funcionam.</div>
+  </div>
+  <button class="theme-btn" id="btnTheme">🌙 Escuro</button>
+</div>
+
+<div class="phone">
+  <div class="viewport">
+
+    <!-- status bar -->
+    <div class="status-bar" id="statusBar">
+      <span id="clockNow">9:41</span>
+      <span class="status-icons">
+        <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="7" width="3" height="5" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1" opacity=".35"/></svg>
+        <svg width="17" height="12" viewBox="0 0 17 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M1 4.2a11 11 0 0 1 15 0"/><path d="M3.7 7a7.2 7.2 0 0 1 9.6 0"/><circle cx="8.5" cy="10.2" r="1.3" fill="currentColor" stroke="none"/></svg>
+        <svg width="26" height="12" viewBox="0 0 26 12" fill="none"><rect x=".5" y=".5" width="21" height="11" rx="3.2" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="16" height="8" rx="2" fill="currentColor"/><path d="M23.5 4v4a2.2 2.2 0 0 0 0-4z" fill="currentColor" opacity=".4"/></svg>
+      </span>
+    </div>
+    <div class="island"></div>
+
+    <div class="screens">
+
+      <!-- ==================== NOVA VIAGEM ==================== -->
+      <section class="screen active" id="screen-plan">
+        <div class="navbar"><div class="nav-title">Nova viagem</div></div>
+        <div class="scroll">
+          <div class="map-frame">
+            <div class="map-wrap" id="mapPlan" title="Clique para soltar o pino">
+              <div class="map-hint">👆 Toque no mapa para soltar o pino</div>
+            </div>
+            <div class="gps-chip" id="gpsChip">📡 Buscando GPS…</div>
+            <button class="map-locate" id="btnLocate" title="Usar minha localização">🎯</button>
+          </div>
+
+          <div class="form">
+            <div class="sec-label">Para onde você vai?</div>
+            <div class="card">
+              <div class="row">
+                <input class="field" id="searchInput" placeholder="Buscar lugar (ex.: Terminal Tietê)" autocomplete="off">
+              </div>
+              <div id="searching" class="searching" hidden>Buscando…</div>
+              <div id="searchResults"></div>
+              <div id="destWrap">
+                <div class="sep"></div>
+                <div class="row"><span>Destino</span><span class="val" id="destName">—</span></div>
+                <div class="sep"></div>
+                <div class="row" id="destCoordRow" hidden><span>Coordenadas (GPS)</span><span class="val" id="destCoord">—</span></div>
+                <div class="sep"></div>
+                <div class="row" id="destDistRow" hidden><span>Distância em linha reta</span><span class="val" id="destDist">—</span></div>
+              </div>
+            </div>
+            <p class="footer">Toque no mapa para soltar um pino no ponto exato em que você precisa descer.</p>
+
+            <div class="sec-label">Regra de despertar</div>
+            <div class="card">
+              <div class="row"><span>Acordar por</span></div>
+              <div class="seg">
+                <button id="segTime" class="on">⏱ Tempo</button>
+                <button id="segDist">📍 Distância</button>
+              </div>
+              <div class="sep"></div>
+              <div class="row" id="ruleTimeRow">
+                <span>Avisar</span>
+                <div class="stepper">
+                  <button id="minDown">−</button>
+                  <div class="st-val"><input id="minInput" class="num-inline" type="number" min="1" max="180" step="1" value="15" inputmode="numeric" title="Toque para digitar">&nbsp;min</div>
+                  <button id="minUp">＋</button>
+                </div>
+              </div>
+              <div class="row col" id="ruleDistRow" hidden>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <span>Avisar a</span>
+                  <span style="display:flex;align-items:center;gap:5px;">
+                    <input id="kmInput" class="num-inline right" type="text" inputmode="decimal" value="2,5" title="Toque para digitar">
+                    <span class="val">km</span>
+                  </span>
+                </div>
+                <input type="range" id="kmSlider" min="0.1" max="20" step="0.1" value="2.5">
+              </div>
+            </div>
+            <p class="footer" id="ruleFooter">O alarme toca quando faltar 15 minutos para chegar.</p>
+
+            <button class="btn btn-primary" id="startBtn" disabled>▶ Iniciar viagem</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== HISTÓRICO ==================== -->
+      <section class="screen" id="screen-history">
+        <div class="navbar"><div class="nav-title">Histórico</div></div>
+        <div class="scroll">
+          <div id="histList"></div>
+        </div>
+      </section>
+
+      <!-- ==================== AJUSTES ==================== -->
+      <section class="screen" id="screen-settings">
+        <div class="navbar"><div class="nav-title">Ajustes</div></div>
+        <div class="scroll">
+          <div class="form">
+            <div class="sec-label">Unidades</div>
+            <div class="card">
+              <div class="row"><span>Distância</span></div>
+              <div class="seg">
+                <button id="unitMetric" class="on">Métrico (km)</button>
+                <button id="unitImperial">Imperial (mi)</button>
+              </div>
+            </div>
+
+            <div class="sec-label">Despertar</div>
+            <div class="card">
+              <div class="row">
+                <span>Margem de segurança</span>
+                <div class="stepper">
+                  <button id="marginDown">−</button>
+                  <div class="st-val"><span id="marginVal">3</span>&nbsp;min</div>
+                  <button id="marginUp">＋</button>
+                </div>
+              </div>
+            </div>
+            <p class="footer">Tempo extra somado ao aviso para absorver imprevistos de trânsito.</p>
+
+            <div class="sec-label">Alarme</div>
+            <div class="card">
+              <div class="row">
+                <span>Som do alarme</span>
+                <label class="switch"><input type="checkbox" id="swSound" checked><span class="track"></span><span class="knob"></span></label>
+              </div>
+              <div id="volRow">
+                <div class="sep"></div>
+                <div class="row col">
+                  <div style="display:flex;justify-content:space-between;font-size:14px;color:var(--secondary)">
+                    <span>🔈</span><span>Volume</span><span>🔊</span>
+                  </div>
+                  <input type="range" id="volSlider" min="0" max="1" step="0.05" value="0.8">
+                </div>
+              </div>
+              <div class="sep"></div>
+              <div class="row">
+                <span>Vibração</span>
+                <label class="switch"><input type="checkbox" id="swHaptics" checked><span class="track"></span><span class="knob"></span></label>
+              </div>
+            </div>
+
+            <div class="sec-label">Aparência</div>
+            <div class="card">
+              <div class="row"><span>Tema</span></div>
+              <div class="seg">
+                <button id="themeLight" class="on">☀️ Claro</button>
+                <button id="themeDark">🌙 Escuro</button>
+              </div>
+            </div>
+            <p class="footer">Escolha entre claro e escuro — vale para todo o app.</p>
+
+            <div class="sec-label">Sobre</div>
+            <div class="card">
+              <div class="row"><span>Versão</span><span class="val">1.0.0</span></div>
+              <div class="sep"></div>
+              <div class="row" style="align-items:flex-start">
+                <p class="footer" style="margin:0">O AcordeAqui usa sua localização durante a viagem para calcular o tempo e a distância até o destino. Nada é enviado para servidores.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- ==================== TAB BAR ==================== -->
+    <nav class="tab-bar" id="tabBar">
+      <button data-screen="plan" class="on">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M9 4 3 6.5v13.5L9 17.5l6 2.5 6-2.5V4l-6 2.5L9 4z"/><path d="M9 4v13.5M15 6.5V20"/></svg>
+        Nova viagem
+      </button>
+      <button data-screen="history">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.2V12l3.4 2"/></svg>
+        Histórico
+      </button>
+      <button data-screen="settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7.5h8M17 7.5h3M4 16.5h3M12 16.5h8"/><circle cx="14.5" cy="7.5" r="2.4"/><circle cx="9.5" cy="16.5" r="2.4"/></svg>
+        Ajustes
+      </button>
+    </nav>
+
+    <!-- ==================== COVER: ACOMPANHANDO ==================== -->
+    <div class="cover" id="coverTracking">
+      <div class="navbar">
+        <button class="nav-btn" id="btnEnd">Encerrar</button>
+        <div class="nav-title">Acompanhando</div>
+      </div>
+      <div class="scroll">
+        <div class="padded">
+          <div class="banner" id="phaseBanner">● Em viagem</div>
+
+          <div class="map-wrap small" id="mapTrack"></div>
+
+          <div class="card" style="padding:16px 12px">
+            <div class="stats">
+              <div class="stat">
+                <div class="ico">⏳</div>
+                <div class="num" id="statTime">40 min</div>
+                <div class="cap">Faltam</div>
+              </div>
+              <div style="width:1px;background:var(--sep)"></div>
+              <div class="stat">
+                <div class="ico">🛣️</div>
+                <div class="num" id="statDist">6,8 km</div>
+                <div class="cap">Distância</div>
+              </div>
+              <div style="width:1px;background:var(--sep)"></div>
+              <div class="stat">
+                <div class="ico">🕐</div>
+                <div class="num" id="statArrival">10:05</div>
+                <div class="cap">Chegada</div>
+              </div>
+            </div>
+            <div class="off-route" id="offRoute" hidden>⚠️ Fora da rota — recalculando…</div>
+          </div>
+
+          <!-- Badge de tráfego ao vivo -->
+          <div id="trafficBadge" style="text-align:center">
+            <span class="badge" id="trafficStatus">🔄 ETA atualizado a cada 3 min com tráfego ao vivo</span>
+          </div>
+
+          <div class="card" style="padding:12px 16px;font-size:13.5px;color:var(--secondary)">
+            Alarme configurado: <b id="tripRule" style="color:var(--text)">15 min antes</b>
+            <span id="tripTrigger"></span>
+          </div>
+
+          <button class="btn-demo" id="btnDemoAlarm">⚡ Disparar alarme agora (demo)</button>
+          <button class="btn btn-danger-outline" id="btnCancelTrip">✕ Cancelar viagem</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== COVER: ALARME ==================== -->
+    <div class="cover alarm" id="coverAlarm">
+      <div class="alarm-body">
+        <div>
+          <div class="alarm-bell">🔔</div>
+          <div class="alarm-title">ACORDE!</div>
+        </div>
+        <div>
+          <div class="alarm-sub">Você está chegando em</div>
+          <div class="alarm-dest" id="alarmDest">Terminal Tietê</div>
+          <div class="alarm-remain" id="alarmRemain">Faltam 1,2 km</div>
+        </div>
+        <div class="alarm-actions">
+          <button class="alarm-btn alarm-stop" id="btnStopAlarm">■ Parar alarme</button>
+          <button class="alarm-btn alarm-snooze" id="btnSnooze">🕐 Adiar 3 min</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="home-indicator"></div>
+  </div>
+</div>
+
+<div class="legend">
+  <b>Experimente:</b> clique no mapa para soltar o pino · digite no campo de busca (“Tietê”, “Sé”, “Ibirapuera”…) ·
+  troque entre Tempo e Distância e mexa no stepper/slider · <b>Iniciar viagem</b> abre o acompanhamento com contagem ao vivo
+  (o alarme dispara sozinho quando a regra é atingida, ou use o botão demo) · <b>Parar</b> e <b>Adiar 3 min</b> funcionam ·
+  viagens encerradas aparecem no Histórico · o tema claro/escuro fica em <b>Ajustes</b> (ou pelo botão do topo) ·<br>
+  <b>Sem internet:</b> o mapa se ancora no <b>GPS do aparelho</b> — coordenadas, pinos e distâncias são calculados
+  localmente (sem nenhuma requisição de rede); a busca funciona com a lista de lugares embutida.
+</div>
+
+<script>
+(function () {
+  "use strict";
+  const $ = (s) => document.querySelector(s);
+
+  /* ---------------- estado ---------------- */
+  const state = {
+    dest: null,
+    gps: null,
+    ruleKind: "time",
+    minutes: 15,
+    km: 2.5,
+    unit: "metric",
+    margin: 3,
+    sound: true,
+    volume: 0.8,
+    haptics: true,
+    trip: null,
+    timer: null
+  };
+
+  const PLACES = [
+    { name: "Terminal Tietê", sub: "Av. Cruzeiro do Sul, 1700 — Santana", x: 250, y: 62 },
+    { name: "Estação Sé", sub: "Praça da Sé — Sé, São Paulo", x: 176, y: 122 },
+    { name: "Terminal Bandeira", sub: "Av. Rangel Pestana — Brás", x: 300, y: 96 },
+    { name: "Estação da Luz", sub: "Praça da Luz — Luz", x: 128, y: 74 },
+    { name: "Shopping Ibirapuera", sub: "Av. dos Bandeirantes — Indianópolis", x: 96, y: 168 },
+    { name: "Aeroporto de Guarulhos", sub: "Rod. Presidente Dutra, km 229", x: 344, y: 36 },
+    { name: "Parque Ibirapuera", sub: "Av. Pedro Álvares Cabral — Vila Mariana", x: 66, y: 140 }
+  ];
+
+  const state2 = {
+    history: [
+      { name: "Terminal Tietê", rule: "15 min antes", when: "Ontem, 07:12", status: "arrived" },
+      { name: "Estação Sé", rule: "2,0 km antes", when: "Seg, 18:40", status: "arrived" }
+    ]
+  };
+
+  const USER = { x: 70, y: 198 };           // usuário no mapa demonstrativo (sem GPS)
+  const CENTER = { x: 195, y: 120 };
+  const MAP_W_M = 6000;                      // largura do quadro do mapa, em metros
+  const M_PER_UNIT = MAP_W_M / 390;
+  const BASE = { lat: -23.55, lng: -46.63 }; // referência quando o GPS está indisponível
+  const TRIP_TOTAL_SEC = 40 * 60;  // 40 min para o modo demo sem GPS
+  const TRIP_TOTAL_M = 6800;
+
+  // Converte a grade esquemática em coordenadas reais (referência BASE).
+  PLACES.forEach((p) => { const ll = xyToLatLng(p.x, p.y, BASE); p.lat = ll.lat; p.lng = ll.lng; });
+
+  function curOrigin() { return state.gps || BASE; }
+  function latLngToXY(lat, lng, o) {
+    o = o || curOrigin();
+    const kx = 111320 * Math.cos((o.lat * Math.PI) / 180);
+    return {
+      x: CENTER.x + ((lng - o.lng) * kx) / M_PER_UNIT,
+      y: CENTER.y - ((lat - o.lat) * 110540) / M_PER_UNIT
+    };
+  }
+  function xyToLatLng(x, y, o) {
+    o = o || curOrigin();
+    const kx = 111320 * Math.cos((o.lat * Math.PI) / 180);
+    return {
+      lat: o.lat + ((CENTER.y - y) * M_PER_UNIT) / 110540,
+      lng: o.lng + ((x - CENTER.x) * M_PER_UNIT) / kx
+    };
+  }
+  function haversine(a, b) {
+    const R = 6371000, rad = Math.PI / 180;
+    const dLat = (b.lat - a.lat) * rad, dLng = (b.lng - a.lng) * rad;
+    const s = Math.sin(dLat / 2) ** 2 +
+      Math.cos(a.lat * rad) * Math.cos(b.lat * rad) * Math.sin(dLng / 2) ** 2;
+    return 2 * R * Math.asin(Math.sqrt(s));
+  }
+  function userXY() { return state.gps ? { x: CENTER.x, y: CENTER.y } : { x: USER.x, y: USER.y }; }
+  function destXY() {
+    const d = state.dest;
+    if (!d) return null;
+    if (d.lat == null) return { x: d.x, y: d.y };
+    const p = latLngToXY(d.lat, d.lng);
+    return { x: Math.max(14, Math.min(376, p.x)), y: Math.max(36, Math.min(226, p.y)) };
+  }
+  function triggerText() {
+    const t = state.trip;
+    let s = state.ruleKind === "time"
+      ? " · dispara faltando " + state.minutes + " min"
+      : " · dispara faltando " + fmtDist(state.km * 1000);
+    if (t && t.real) s += " · real " + fmtDist(t.totalM);
+    return s;
+  }
+
+  /* ---------------- GPS do aparelho (local, sem rede) ---------------- */
+  let watchId = null;
+  function setGpsChip(cls, text) {
+    const c = $("#gpsChip");
+    if (!c) return;
+    c.className = "gps-chip" + (cls ? " " + cls : "");
+    c.textContent = text;
+  }
+  function updateDestRows() {
+    const hasGps = !!(state.gps && state.dest && state.dest.lat != null);
+    $("#destCoordRow").hidden = !hasGps;
+    $("#destDistRow").hidden = !hasGps;
+    if (hasGps) {
+      const acc = state.gps.acc ? " ±" + state.gps.acc + " m" : "";
+      $("#destCoord").textContent = state.dest.lat.toFixed(5) + ", " + state.dest.lng.toFixed(5) + acc;
+      $("#destDist").textContent = fmtDist(haversine(state.gps, state.dest));
+    }
+  }
+  function onGeoFix(pos) {
+    const first = !state.gps;
+    state.gps = {
+      lat: pos.coords.latitude,
+      lng: pos.coords.longitude,
+      acc: Math.round(pos.coords.accuracy || 0)
+    };
+    setGpsChip("ok", "📍 " + state.gps.lat.toFixed(5) + ", " + state.gps.lng.toFixed(5) + " ±" + state.gps.acc + " m");
+    updateDestRows();
+    if (first) redrawPlanMap();
+  }
+  function onGeoError(err) {
+    state.gps = null;
+    setGpsChip("err", err && err.code === 1
+      ? "⚠️ Permissão de localização negada — mapa demonstrativo"
+      : "⚠️ GPS indisponível — mapa demonstrativo");
+    updateDestRows();
+    redrawPlanMap();
+  }
+  function initGps() {
+    if (!navigator.geolocation) { onGeoError(null); return; }
+    setGpsChip("", "📡 Buscando GPS…");
+    if (watchId != null) navigator.geolocation.clearWatch(watchId);
+    watchId = navigator.geolocation.watchPosition(onGeoFix, onGeoError,
+      { enableHighAccuracy: true, maximumAge: 3000, timeout: 20000 });
+  }
+
+  /* ---------------- utilidades ---------------- */
+  function fmtDist(m) {
+    if (state.unit === "imperial") {
+      const mi = m / 1609.344;
+      if (mi < 0.1) return Math.round(m * 3.281) + " ft";
+      return mi.toFixed(1).replace(".", ",") + " mi";
+    }
+    if (m >= 1000) return (m / 1000).toFixed(1).replace(".", ",") + " km";
+    return Math.round(m) + " m";
+  }
+  function fmtClock(date) {
+    return String(date.getHours()).padStart(2, "0") + ":" + String(date.getMinutes()).padStart(2, "0");
+  }
+  function fmtMMSS(sec) {
+    // Para o snooze (sempre < 5 min) continua mostrando MM:SS.
+    sec = Math.max(0, Math.round(sec));
+    return String(Math.floor(sec / 60)).padStart(2, "0") + ":" + String(sec % 60).padStart(2, "0");
+  }
+  // Espelha Formatting.duration do app Swift: "2h 05min" / "12 min" / "45 s"
+  function fmtDuration(sec) {
+    sec = Math.max(0, Math.round(sec));
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const s = sec % 60;
+    if (h > 0) return m > 0 ? h + "h " + m + "min" : h + "h";
+    if (m > 0) return m + " min";
+    return s + " s";
+  }
+  function ruleSummary() {
+    return state.ruleKind === "time"
+      ? state.minutes + " min antes"
+      : state.km.toFixed(1).replace(".", ",") + " km antes";
+  }
+  function beep() {
+    if (!state.sound) return;
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      const ctx = new Ctx();
+      [0, 0.28].forEach((t0) => {
+        const o = ctx.createOscillator(), g = ctx.createGain();
+        o.type = "square"; o.frequency.value = 880;
+        g.gain.value = 0;
+        o.connect(g); g.connect(ctx.destination);
+        const t = ctx.currentTime + t0;
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.linearRampToValueAtTime(0.25 * state.volume, t + 0.02);
+        g.gain.linearRampToValueAtTime(0.0001, t + 0.22);
+        o.start(t); o.stop(t + 0.24);
+      });
+      setTimeout(() => ctx.close(), 1200);
+    } catch (e) { /* sem áudio no protótipo */ }
+  }
+  function buzz() {
+    if (state.haptics && navigator.vibrate) { try { navigator.vibrate([80, 60, 80]); } catch (e) {} }
+  }
+
+  /* ---------------- mapa ---------------- */
+  function mapBase() {
+    return `
+      <rect class="m-bg" x="0" y="0" width="390" height="240"/>
+      <rect class="m-park" x="222" y="128" width="96" height="52" rx="8"/>
+      <rect class="m-block" x="16" y="14" width="86" height="26" rx="4"/>
+      <rect class="m-block" x="136" y="14" width="60" height="26" rx="4"/>
+      <rect class="m-block" x="316" y="150" width="60" height="44" rx="4"/>
+      <rect class="m-block" x="16" y="212" width="120" height="20" rx="4"/>
+      <path class="m-water" d="M358 -10 Q 344 50 356 110 T 344 250"/>
+      <path class="m-street" d="M0 50 H390 M0 112 H390 M0 186 H390"/>
+      <path class="m-street" d="M46 0 V240 M136 0 V240 M316 0 V240"/>
+      <path class="m-street-minor" d="M0 82 H390 M0 150 H390 M92 0 V240 M222 0 V240 M270 0 V240"/>
+      <path class="m-street-minor" d="M-10 240 L140 90" opacity=".9"/>
+    `;
+  }
+  function routePath(x, y) {
+    const u = userXY();
+    return `M${u.x} ${u.y} V${y} H${x}`;
+  }
+  function renderMap(el, opts) {
+    opts = opts || {};
+    let extra = "";
+    const u = userXY();
+    const dxy = destXY();
+    if (opts.route && dxy) {
+      extra += `<path class="m-route" d="${routePath(dxy.x, dxy.y)}"/>`;
+      if (opts.progress != null && opts.progress > 0) {
+        const p = Math.min(1, Math.max(0, opts.progress));
+        const seg1 = Math.abs(u.y - dxy.y);
+        const seg2 = Math.abs(dxy.x - u.x);
+        const total = (seg1 + seg2) || 1;
+        const d = p * total;
+        let ux = u.x, uy = u.y;
+        if (d <= seg1) { uy = u.y + (dxy.y - u.y) * (d / (seg1 || 1)); }
+        else { uy = dxy.y; ux = u.x + (dxy.x - u.x) * ((d - seg1) / (seg2 || 1)); }
+        extra += `<path class="m-route-done" d="${routePath(dxy.x, dxy.y)}" stroke-dasharray="${d * 1.001} 9999"/>`;
+        extra += userMarker(ux, uy);
+      } else {
+        extra += userMarker(u.x, u.y);
+      }
+      extra += pinMarker(dxy.x, dxy.y);
+    } else if (opts.pin && dxy) {
+      extra += pinMarker(dxy.x, dxy.y);
+      extra += userMarker(u.x, u.y);
+    } else {
+      extra += userMarker(u.x, u.y);
+    }
+    el.innerHTML = `<svg viewBox="0 0 390 240" preserveAspectRatio="xMidYMid slice">${mapBase()}${extra}</svg>` +
+      (opts.hint ? `<div class="map-hint">${opts.hint}</div>` : "");
+  }
+  function pinMarker(x, y) {
+    return `<g transform="translate(${x},${y})">
+      <ellipse cx="0" cy="2" rx="7" ry="3" class="pin-shadow"/>
+      <path d="M0 0 C -8 -12 -13 -19 -13 -26 A13 13 0 1 1 13 -26 C13 -19 8 -12 0 0 Z" class="pin"/>
+      <circle cx="0" cy="-26" r="4.6" class="pin-dot"/>
+    </g>`;
+  }
+  function userMarker(x, y) {
+    return `<g transform="translate(${x},${y})">
+      <circle r="15" class="user-halo"/><circle r="7" class="user-dot"/>
+    </g>`;
+  }
+  function redrawPlanMap() {
+    renderMap($("#mapPlan"), { pin: true, hint: "👆 Toque no mapa para soltar o pino" });
+  }
+  function redrawTrackMap() {
+    const t = state.trip;
+    const p = t ? 1 - t.remainingSec / t.totalSec : 0;
+    renderMap($("#mapTrack"), { route: true, progress: p });
+  }
+
+  /* ---------------- tela de planejamento ---------------- */
+  function setDest(dest) {
+    state.dest = dest;
+    $("#destName").textContent = dest.name;
+    $("#destWrap").hidden = false;
+    $("#startBtn").disabled = false;
+    updateDestRows();
+    redrawPlanMap();
+  }
+
+  $("#mapPlan").addEventListener("click", (e) => {
+    const svg = $("#mapPlan").querySelector("svg");
+    if (!svg) return;
+    const r = svg.getBoundingClientRect();
+    const x = Math.max(8, Math.min(382, ((e.clientX - r.left) / r.width) * 390));
+    const y = Math.max(30, Math.min(232, ((e.clientY - r.top) / r.height) * 240));
+    const ll = xyToLatLng(x, y);
+    const acc = state.gps && state.gps.acc ? " ±" + state.gps.acc + " m" : "";
+    setDest({ name: "Ponto no mapa", sub: ll.lat.toFixed(5) + ", " + ll.lng.toFixed(5) + acc, lat: ll.lat, lng: ll.lng });
+  });
+
+  let searchTimer = null;
+  $("#searchInput").addEventListener("input", function () {
+    const q = this.value.trim().toLowerCase();
+    clearTimeout(searchTimer);
+    if (!q) { $("#searchResults").innerHTML = ""; $("#searching").hidden = true; return; }
+    $("#searching").hidden = false;
+    searchTimer = setTimeout(() => {
+      $("#searching").hidden = true;
+      const hits = PLACES.filter((p) => (p.name + " " + p.sub).toLowerCase().includes(q));
+      $("#searchResults").innerHTML = hits.length
+        ? hits.map((p, i) => `<button class="result-row" data-i="${PLACES.indexOf(p)}">${p.name}<span class="sub2">${p.sub}</span></button>`).join("")
+        : `<div class="searching">Nenhum lugar encontrado — toque no mapa para soltar um pino.</div>`;
+    }, 350);
+  });
+  $("#searchResults").addEventListener("click", (e) => {
+    const btn = e.target.closest(".result-row");
+    if (!btn) return;
+    const p = PLACES[Number(btn.dataset.i)];
+    $("#searchInput").value = p.name;
+    $("#searchResults").innerHTML = "";
+    setDest({ name: p.name, sub: p.sub, lat: p.lat, lng: p.lng });
+  });
+
+  /* regra */
+  function setRuleKind(kind) {
+    state.ruleKind = kind;
+    $("#segTime").classList.toggle("on", kind === "time");
+    $("#segDist").classList.toggle("on", kind === "distance");
+    $("#ruleTimeRow").hidden = kind !== "time";
+    $("#ruleDistRow").hidden = kind !== "distance";
+    updateRuleFooter();
+  }
+  function updateRuleFooter() {
+    $("#ruleFooter").textContent = state.ruleKind === "time"
+      ? "O alarme toca quando faltar " + state.minutes + " minutos para chegar."
+      : "O alarme toca faltando " + fmtDist(state.km * 1000) + " do ponto.";
+  }
+  $("#segTime").addEventListener("click", () => setRuleKind("time"));
+  $("#segDist").addEventListener("click", () => setRuleKind("distance"));
+
+  /* minutos: stepper + campo editável */
+  function setMinutes(v, typing) {
+    const n = Math.round(Number(v));
+    if (!Number.isFinite(n)) return;
+    state.minutes = Math.min(180, Math.max(1, n));
+    if (!typing) $("#minInput").value = state.minutes;
+    updateRuleFooter();
+  }
+  $("#minUp").addEventListener("click", () => setMinutes(state.minutes + 1));
+  $("#minDown").addEventListener("click", () => setMinutes(state.minutes - 1));
+  $("#minInput").addEventListener("input", function () {
+    const n = parseInt(this.value, 10);
+    if (Number.isFinite(n) && n >= 1 && n <= 180) setMinutes(n, true);
+  });
+  $("#minInput").addEventListener("change", function () {
+    const n = parseInt(this.value, 10);
+    setMinutes(Number.isFinite(n) ? n : state.minutes);
+    this.value = state.minutes;
+  });
+
+  /* quilômetros: slider + campo editável (aceita vírgula ou ponto) */
+  function parseKm(raw) {
+    const v = parseFloat(String(raw).replace(",", "."));
+    if (!Number.isFinite(v)) return null;
+    return Math.min(20, Math.max(0.1, v));
+  }
+  function setKm(v, typing) {
+    state.km = Math.round(v * 10) / 10;
+    if (!typing) $("#kmInput").value = String(state.km).replace(".", ",");
+    $("#kmSlider").value = state.km;
+    updateRuleFooter();
+  }
+  $("#kmSlider").addEventListener("input", function () { setKm(Number(this.value)); });
+  $("#kmInput").addEventListener("input", function () {
+    const v = parseKm(this.value);
+    if (v != null) {
+      state.km = Math.round(v * 10) / 10;
+      $("#kmSlider").value = state.km;
+      updateRuleFooter();
+    }
+  });
+  $("#kmInput").addEventListener("change", function () {
+    const v = parseKm(this.value);
+    setKm(v != null ? v : state.km);
+  });
+
+  /* ---------------- viagem ---------------- */
+  const PHASES = {
+    moving:   { t: "● Em viagem",        c: "" },
+    ringing:  { t: "● Alarme tocando",   c: "red" },
+    warned:   { t: "● Você foi avisado", c: "orange" },
+    snoozed:  { t: "● Adiado",           c: "blue" },
+    arrived:  { t: "● Chegada",          c: "green" }
+  };
+  function setPhase(p) {
+    if (!state.trip) return;
+    state.trip.phase = p;
+    const info = PHASES[p];
+    const b = $("#phaseBanner");
+    b.className = "banner " + info.c;
+    b.textContent = info.t;
+  }
+
+  function openCover(el) { el.classList.add("open"); }
+  function closeCover(el) { el.classList.remove("open"); }
+
+  $("#startBtn").addEventListener("click", () => {
+    if (!state.dest) return;
+    const real = !!(state.gps && state.dest.lat != null);
+    let totalM = TRIP_TOTAL_M, totalSec = TRIP_TOTAL_SEC;
+    if (real) {
+      // Distância real por haversine; duração simulada a ~8,3 m/s (30 km/h, velocidade
+      // média de ônibus urbano considerando paradas e semáforos).
+      // Sem cap de tempo — viagens longas (ex.: 2 h de ônibus intermunicipal) são válidas.
+      totalM = Math.max(120, Math.round(haversine(state.gps, state.dest)));
+      totalSec = Math.max(45, Math.round(totalM / 8.3));
+    }
+    state.trip = {
+      totalSec: totalSec,
+      remainingSec: totalSec,
+      totalM: totalM,
+      remainingM: totalM,
+      real: real,
+      warned: false,
+      snoozeRemain: 0,
+      phase: "moving"
+    };
+    $("#tripRule").textContent = ruleSummary();
+    $("#tripTrigger").textContent = triggerText();
+    setPhase("moving");
+    openCover($("#coverTracking"));
+    redrawTrackMap();
+    renderTrip();
+    clearInterval(state.timer);
+    state.timer = setInterval(tick, 1000);
+  });
+
+  function tick() {
+    const t = state.trip;
+    if (!t) return;
+
+    if (t.phase === "snoozed") {
+      t.snoozeRemain--;
+      if (t.snoozeRemain <= 0) { fireAlarm(); return; }
+      $("#phaseBanner").textContent = "● Adiado — toca em " + fmtMMSS(t.snoozeRemain);
+      $("#tripTrigger").textContent = " · alarme toca em " + fmtMMSS(t.snoozeRemain);
+      return;
+    }
+
+    if (t.phase === "arrived") return;
+
+    t.remainingSec = Math.max(0, t.remainingSec - 1);
+    t.remainingM = Math.round((t.totalM * t.remainingSec / t.totalSec) / 10) * 10;
+
+    if (t.remainingSec === 0) {
+      setPhase("arrived");
+      beep(); buzz();
+      return;
+    }
+
+    if (!t.warned) {
+      const timeHit = state.ruleKind === "time" && t.remainingSec <= state.minutes * 60;
+      const distHit = state.ruleKind === "distance" && t.remainingM <= state.km * 1000;
+      if (timeHit || distHit) { fireAlarm(); return; }
+    }
+    renderTrip();
+  }
+
+  // Simula atualizações periódicas de ETA com tráfego (a cada 3 min = 180 ticks).
+  let trafficTickCounter = 0;
+  function renderTrip() {
+    const t = state.trip;
+    if (!t) return;
+    $("#statTime").textContent = fmtDuration(t.remainingSec);
+    $("#statDist").textContent = fmtDist(t.remainingM);
+    // Chegada estimada: mesma informação que o statEta antigo, agora na 3ª coluna.
+    $("#statArrival").textContent = fmtClock(new Date(Date.now() + t.remainingSec * 1000));
+    const trig = $("#tripTrigger");
+    if (t.phase === "moving" && !t.warned) {
+      trig.textContent = triggerText();
+    }
+    $("#offRoute").hidden = Math.random() > 0.993;
+
+    // Badge de tráfego: pisca brevemente a cada 180 s simulando reroute periódico.
+    trafficTickCounter++;
+    const badge = $("#trafficStatus");
+    if (badge) {
+      if (trafficTickCounter % 180 === 0) {
+        // Simula busca de nova rota com tráfego.
+        badge.textContent = "⏳ Atualizando ETA com tráfego…";
+        setTimeout(() => {
+          // Pequena variação aleatória no ETA para parecer real (±30 s).
+          const delta = Math.floor(Math.random() * 60) - 30;
+          t.remainingSec = Math.max(10, t.remainingSec + delta);
+          if (badge) badge.textContent = "✅ ETA atualizado · tráfego ao vivo";
+          setTimeout(() => {
+            if (badge) badge.textContent = "🔄 ETA atualizado a cada 3 min com tráfego ao vivo";
+          }, 3000);
+        }, 1800);
+      }
+    }
+
+    redrawTrackMap();
+  }
+
+  function fireAlarm() {
+    const t = state.trip;
+    if (!t) return;
+    t.warned = true;
+    t.snoozeRemain = 0;
+    setPhase("ringing");
+    $("#alarmDest").textContent = state.dest ? state.dest.name : "seu destino";
+    $("#alarmRemain").textContent = "Faltam " + fmtDist(t.remainingM);
+    $("#statusBar").classList.add("light-content");
+    openCover($("#coverAlarm"));
+    beep(); buzz();
+  }
+
+  $("#btnDemoAlarm").addEventListener("click", fireAlarm);
+
+  $("#btnStopAlarm").addEventListener("click", () => {
+    closeCover($("#coverAlarm"));
+    $("#statusBar").classList.remove("light-content");
+    if (state.trip) setPhase("warned");
+    renderTrip();
+  });
+
+  $("#btnSnooze").addEventListener("click", () => {
+    closeCover($("#coverAlarm"));
+    $("#statusBar").classList.remove("light-content");
+    if (state.trip) {
+      state.trip.snoozeRemain = 180;
+      setPhase("snoozed");
+      $("#phaseBanner").textContent = "● Adiado — toca em 03:00";
+      $("#tripTrigger").textContent = " · alarme toca em 03:00";
+    }
+  });
+
+  function endTrip(status) {
+    clearInterval(state.timer);
+    state.timer = null;
+    if (state.dest) {
+      state2.history.unshift({
+        name: state.dest.name,
+        rule: ruleSummary(),
+        when: "Hoje, " + fmtClock(new Date()),
+        status: status
+      });
+    }
+    closeCover($("#coverAlarm"));
+    closeCover($("#coverTracking"));
+    $("#statusBar").classList.remove("light-content");
+    state.trip = null;
+    renderHistory();
+    if (status === "arrived" || status === "cancelled") setScreen("history");
+  }
+
+  $("#btnCancelTrip").addEventListener("click", () => endTrip("cancelled"));
+  $("#btnEnd").addEventListener("click", () => endTrip(state.trip && state.trip.phase === "arrived" ? "arrived" : "cancelled"));
+
+  /* ---------------- navegação ---------------- */
+  function setScreen(name) {
+    document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
+    $("#screen-" + name).classList.add("active");
+    document.querySelectorAll("#tabBar button").forEach((b) => {
+      b.classList.toggle("on", b.dataset.screen === name);
+    });
+  }
+  $("#tabBar").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-screen]");
+    if (b) setScreen(b.dataset.screen);
+  });
+
+  /* ---------------- histórico ---------------- */
+  function renderHistory() {
+    const el = $("#histList");
+    if (!state2.history.length) {
+      el.innerHTML = `<div class="list-empty">
+        <div class="big">🌙</div>
+        <div class="t">Nenhuma viagem ainda</div>
+        <div class="d">Configure seu primeiro despertador de viagem na aba Nova viagem.</div>
+      </div>`;
+      return;
+    }
+    el.innerHTML = `<div class="card" style="border-radius:0">` + state2.history.map((h) => `
+      <div class="hist-row" style="border-top:1px solid var(--sep)">
+        <div style="flex:1">
+          <div class="name">${h.name}</div>
+          <div class="meta">${h.rule}</div>
+          <div class="meta2">${h.when}</div>
+        </div>
+        <span class="badge ${h.status === "arrived" ? "green" : ""}">
+          ${h.status === "arrived" ? "✓ Chegou" : "✕ Cancelada"}
+        </span>
+      </div>`).join("") + `</div>`;
+  }
+
+  /* ---------------- ajustes ---------------- */
+  function setUnit(u) {
+    state.unit = u;
+    $("#unitMetric").classList.toggle("on", u === "metric");
+    $("#unitImperial").classList.toggle("on", u === "imperial");
+    $("#kmInput").value = String(state.km).replace(".", ",");
+    updateRuleFooter();
+    if (state.trip) renderTrip();
+  }
+  $("#unitMetric").addEventListener("click", () => setUnit("metric"));
+  $("#unitImperial").addEventListener("click", () => setUnit("imperial"));
+
+  $("#marginUp").addEventListener("click", () => { state.margin = Math.min(30, state.margin + 1); $("#marginVal").textContent = state.margin; });
+  $("#marginDown").addEventListener("click", () => { state.margin = Math.max(0, state.margin - 1); $("#marginVal").textContent = state.margin; });
+
+  $("#swSound").addEventListener("change", function () {
+    state.sound = this.checked;
+    $("#volRow").hidden = !this.checked;
+  });
+  $("#volSlider").addEventListener("input", function () { state.volume = Number(this.value); });
+  $("#swHaptics").addEventListener("change", function () { state.haptics = this.checked; });
+
+  /* ---------------- tema ---------------- */
+  function setTheme(mode) {
+    document.body.dataset.theme = mode;
+    $("#themeLight").classList.toggle("on", mode === "light");
+    $("#themeDark").classList.toggle("on", mode === "dark");
+    $("#btnTheme").textContent = mode === "dark" ? "☀️ Claro" : "🌙 Escuro";
+  }
+  $("#btnTheme").addEventListener("click", () => {
+    setTheme(document.body.dataset.theme === "dark" ? "light" : "dark");
+  });
+  $("#themeLight").addEventListener("click", () => setTheme("light"));
+  $("#themeDark").addEventListener("click", () => setTheme("dark"));
+
+  /* ---------------- relógio da status bar ---------------- */
+  function updateClock() {
+    const d = new Date();
+    $("#clockNow").textContent = d.getHours() + ":" + String(d.getMinutes()).padStart(2, "0");
+  }
+  setInterval(updateClock, 15000);
+  updateClock();
+
+  /* ---------------- init ---------------- */
+  $("#destWrap").hidden = true;
+  redrawPlanMap();
+  renderHistory();
+  updateRuleFooter();
+  $("#btnLocate").addEventListener("click", initGps);
+  initGps();
+  // Gancho de teste/demonstração: injeta uma posição GPS sem rede.
+  window.AcordeDemo = {
+    setGps: (lat, lng, acc) => onGeoFix({ coords: { latitude: lat, longitude: lng, accuracy: acc || 10 } }),
+    clearGps: () => onGeoError({ code: 0 }),
+    state: state
+  };
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>AcordeAqui — Ícone</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #111;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+    padding: 48px 24px 64px;
+    color: #f2f2f7;
+  }
+  h2 {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: #48484a;
+  }
+  .row { display: flex; gap: 32px; align-items: flex-end; flex-wrap: wrap; justify-content: center; }
+  .cell { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .lbl { font-size: 11px; color: #48484a; text-align: center; line-height: 1.4; }
+
+  canvas { display: block; image-rendering: pixelated; }
+
+  .export-btn {
+    background: #0a84ff;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 12px 28px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  .export-btn:hover { background: #0070d8; }
+
+  .divider {
+    width: 100%;
+    max-width: 560px;
+    height: 1px;
+    background: rgba(255,255,255,.07);
+  }
+
+  /* Preview estático grande */
+  .big-icon {
+    width: 200px;
+    height: 200px;
+    border-radius: 44px;
+    overflow: hidden;
+    box-shadow: 0 24px 64px rgba(0,0,0,.8);
+    flex-shrink: 0;
+  }
+  .big-icon svg { display: block; width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+
+<h2>AcordeAqui — Ícone final</h2>
+
+<!-- ── PREVIEW GRANDE ── -->
+<div class="big-icon" id="bigIcon">
+  <svg id="iconSvg" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="sky" x1="0" y1="0" x2="1024" y2="1024" gradientUnits="userSpaceOnUse">
+        <stop offset="0%"   stop-color="#0b1a2e"/>
+        <stop offset="55%"  stop-color="#102035"/>
+        <stop offset="100%" stop-color="#0e2a3a"/>
+      </linearGradient>
+
+      <radialGradient id="moonGrad" cx="42%" cy="36%" r="58%">
+        <stop offset="0%"   stop-color="#fffde0"/>
+        <stop offset="60%"  stop-color="#f5de50"/>
+        <stop offset="100%" stop-color="#e8c820"/>
+      </radialGradient>
+
+      <!-- aura suave ao redor da lua -->
+      <radialGradient id="aura" cx="370" cy="390" r="340" gradientUnits="userSpaceOnUse">
+        <stop offset="0%"   stop-color="#f0d840" stop-opacity="0.14"/>
+        <stop offset="100%" stop-color="#f0d840" stop-opacity="0"/>
+      </radialGradient>
+
+      <!-- crescente: mostra o círculo cheio menos o offset -->
+      <mask id="crescent">
+        <rect width="1024" height="1024" fill="black"/>
+        <circle cx="370" cy="390" r="256" fill="white"/>
+        <circle cx="476" cy="318" r="206" fill="black"/>
+      </mask>
+
+      <!-- brilho interno do pin -->
+      <linearGradient id="pinSheen" x1="556" y1="656" x2="780" y2="960" gradientUnits="userSpaceOnUse">
+        <stop offset="0%"   stop-color="#ffffff" stop-opacity="0.35"/>
+        <stop offset="100%" stop-color="#ff3b30" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+
+    <!-- fundo céu noturno -->
+    <rect width="1024" height="1024" fill="url(#sky)"/>
+
+    <!-- estrelinhas -->
+    <circle cx="768" cy="152" r="9"  fill="#ffffff" opacity="0.50"/>
+    <circle cx="888" cy="272" r="7"  fill="#ffffff" opacity="0.38"/>
+    <circle cx="664" cy="100" r="6"  fill="#ffffff" opacity="0.32"/>
+    <circle cx="836" cy="440" r="8"  fill="#ffffff" opacity="0.28"/>
+    <circle cx="136" cy="188" r="8"  fill="#ffffff" opacity="0.28"/>
+    <circle cx="240" cy="120" r="6"  fill="#ffffff" opacity="0.22"/>
+    <circle cx="920" cy="540" r="5"  fill="#ffffff" opacity="0.20"/>
+    <circle cx="100" cy="420" r="5"  fill="#ffffff" opacity="0.18"/>
+
+    <!-- aura da lua -->
+    <circle cx="370" cy="390" r="340" fill="url(#aura)"/>
+
+    <!-- lua crescente -->
+    <circle cx="370" cy="390" r="256" fill="url(#moonGrad)" mask="url(#crescent)"/>
+
+    <!--
+      ZZZ em cascata diagonal ascendente, saindo da borda direita da lua.
+      Cada Z é desenhado com 3 linhas: topo, diagonal, base.
+      Z grande (82px) → Z médio (58px) → Z pequeno (38px)
+    -->
+
+    <!-- Z grande -->
+    <g opacity="0.96">
+      <line x1="562" y1="444" x2="698" y2="444" stroke="#ffffff" stroke-width="36" stroke-linecap="round"/>
+      <line x1="698" y1="444" x2="562" y2="564" stroke="#ffffff" stroke-width="36" stroke-linecap="round"/>
+      <line x1="562" y1="564" x2="698" y2="564" stroke="#ffffff" stroke-width="36" stroke-linecap="round"/>
+    </g>
+
+    <!-- Z médio -->
+    <g opacity="0.68">
+      <line x1="668" y1="296" x2="764" y2="296" stroke="#ffffff" stroke-width="28" stroke-linecap="round"/>
+      <line x1="764" y1="296" x2="668" y2="384" stroke="#ffffff" stroke-width="28" stroke-linecap="round"/>
+      <line x1="668" y1="384" x2="764" y2="384" stroke="#ffffff" stroke-width="28" stroke-linecap="round"/>
+    </g>
+
+    <!-- Z pequeno -->
+    <g opacity="0.38">
+      <line x1="746" y1="176" x2="808" y2="176" stroke="#ffffff" stroke-width="22" stroke-linecap="round"/>
+      <line x1="808" y1="176" x2="746" y2="234" stroke="#ffffff" stroke-width="22" stroke-linecap="round"/>
+      <line x1="746" y1="234" x2="808" y2="234" stroke="#ffffff" stroke-width="22" stroke-linecap="round"/>
+    </g>
+
+    <!-- sombra do pin -->
+    <ellipse cx="668" cy="882" rx="68" ry="26" fill="#000000" opacity="0.22"/>
+
+    <!-- corpo do pin -->
+    <path d="
+      M668 664
+      C618 664 560 716 560 776
+      C560 858 668 964 668 964
+      C668 964 776 858 776 776
+      C776 716 718 664 668 664 Z
+    " fill="#ff3b30"/>
+
+    <!-- brilho do pin -->
+    <path d="
+      M668 664
+      C618 664 560 716 560 776
+      C560 858 668 964 668 964
+      C668 964 776 858 776 776
+      C776 716 718 664 668 664 Z
+    " fill="url(#pinSheen)"/>
+
+    <!-- ponto branco central do pin -->
+    <circle cx="668" cy="776" r="40" fill="#ffffff"/>
+  </svg>
+</div>
+
+<!-- ── TAMANHOS iOS ── -->
+<div class="divider"></div>
+<h2>Tamanhos reais iOS</h2>
+<div class="row" id="sizeRow"></div>
+
+<!-- ── FUNDO CLARO ── -->
+<div class="divider"></div>
+<h2>Contexto fundo claro (Spotlight)</h2>
+<div style="background:#f2f2f7;padding:28px 40px;border-radius:20px;display:flex;gap:20px;align-items:center">
+  <div style="width:60px;height:60px;border-radius:13.5px;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,.3)">
+    <svg viewBox="0 0 1024 1024" fill="none" style="width:100%;height:100%;display:block">
+      <use href="#iconSvg"/>
+      <!-- inline porque <use> não copia defs — renderizamos direto -->
+      <defs>
+        <linearGradient id="sky2" x1="0" y1="0" x2="1024" y2="1024" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#0b1a2e"/><stop offset="55%" stop-color="#102035"/><stop offset="100%" stop-color="#0e2a3a"/>
+        </linearGradient>
+        <radialGradient id="moonGrad2" cx="42%" cy="36%" r="58%">
+          <stop offset="0%" stop-color="#fffde0"/><stop offset="60%" stop-color="#f5de50"/><stop offset="100%" stop-color="#e8c820"/>
+        </radialGradient>
+        <mask id="crescent2">
+          <rect width="1024" height="1024" fill="black"/>
+          <circle cx="370" cy="390" r="256" fill="white"/>
+          <circle cx="476" cy="318" r="206" fill="black"/>
+        </mask>
+      </defs>
+      <rect width="1024" height="1024" fill="url(#sky2)"/>
+      <circle cx="370" cy="390" r="256" fill="url(#moonGrad2)" mask="url(#crescent2)"/>
+      <g opacity="0.96"><line x1="562" y1="444" x2="698" y2="444" stroke="#fff" stroke-width="36" stroke-linecap="round"/><line x1="698" y1="444" x2="562" y2="564" stroke="#fff" stroke-width="36" stroke-linecap="round"/><line x1="562" y1="564" x2="698" y2="564" stroke="#fff" stroke-width="36" stroke-linecap="round"/></g>
+      <g opacity="0.68"><line x1="668" y1="296" x2="764" y2="296" stroke="#fff" stroke-width="28" stroke-linecap="round"/><line x1="764" y1="296" x2="668" y2="384" stroke="#fff" stroke-width="28" stroke-linecap="round"/><line x1="668" y1="384" x2="764" y2="384" stroke="#fff" stroke-width="28" stroke-linecap="round"/></g>
+      <g opacity="0.38"><line x1="746" y1="176" x2="808" y2="176" stroke="#fff" stroke-width="22" stroke-linecap="round"/><line x1="808" y1="176" x2="746" y2="234" stroke="#fff" stroke-width="22" stroke-linecap="round"/><line x1="746" y1="234" x2="808" y2="234" stroke="#fff" stroke-width="22" stroke-linecap="round"/></g>
+      <path d="M668 664 C618 664 560 716 560 776 C560 858 668 964 668 964 C668 964 776 858 776 776 C776 716 718 664 668 664 Z" fill="#ff3b30"/>
+      <circle cx="668" cy="776" r="40" fill="#fff"/>
+    </svg>
+  </div>
+  <span style="font-size:14px;font-weight:600;color:#1c1c1e">AcordeAqui</span>
+</div>
+
+<!-- ── EXPORTAR PNG ── -->
+<div class="divider"></div>
+<h2>Exportar</h2>
+<div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+  <button class="export-btn" onclick="exportPng(1024)">⬇ PNG 1024 × 1024</button>
+  <button class="export-btn" onclick="exportPng(512)" style="background:#2c2c2e">⬇ PNG 512 × 512</button>
+  <button class="export-btn" onclick="exportSvg()" style="background:#2c2c2e">⬇ SVG</button>
+</div>
+
+<script>
+// ── renderiza os tamanhos iOS ──────────────────────────────────────
+const SIZES = [
+  { px: 120, label: "Home screen\n60pt @2x",     radius: 26.5 },
+  { px:  80, label: "Spotlight\n40pt @2x",        radius: 18   },
+  { px:  58, label: "Ajustes\n29pt @2x",          radius: 13   },
+  { px:  40, label: "Notificação\n20pt @2x",      radius:  9   },
+];
+
+const svgSource = `<svg viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="skyS" x1="0" y1="0" x2="1024" y2="1024" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0b1a2e"/>
+      <stop offset="55%" stop-color="#102035"/>
+      <stop offset="100%" stop-color="#0e2a3a"/>
+    </linearGradient>
+    <radialGradient id="moonS" cx="42%" cy="36%" r="58%">
+      <stop offset="0%" stop-color="#fffde0"/>
+      <stop offset="60%" stop-color="#f5de50"/>
+      <stop offset="100%" stop-color="#e8c820"/>
+    </radialGradient>
+    <radialGradient id="auraS" cx="370" cy="390" r="340" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f0d840" stop-opacity="0.14"/>
+      <stop offset="100%" stop-color="#f0d840" stop-opacity="0"/>
+    </radialGradient>
+    <mask id="crescentS">
+      <rect width="1024" height="1024" fill="black"/>
+      <circle cx="370" cy="390" r="256" fill="white"/>
+      <circle cx="476" cy="318" r="206" fill="black"/>
+    </mask>
+    <linearGradient id="pinSheenS" x1="556" y1="656" x2="780" y2="960" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#ff3b30" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#skyS)"/>
+  <circle cx="768" cy="152" r="9" fill="#ffffff" opacity="0.50"/>
+  <circle cx="888" cy="272" r="7" fill="#ffffff" opacity="0.38"/>
+  <circle cx="664" cy="100" r="6" fill="#ffffff" opacity="0.32"/>
+  <circle cx="836" cy="440" r="8" fill="#ffffff" opacity="0.28"/>
+  <circle cx="136" cy="188" r="8" fill="#ffffff" opacity="0.28"/>
+  <circle cx="240" cy="120" r="6" fill="#ffffff" opacity="0.22"/>
+  <circle cx="920" cy="540" r="5" fill="#ffffff" opacity="0.20"/>
+  <circle cx="100" cy="420" r="5" fill="#ffffff" opacity="0.18"/>
+  <circle cx="370" cy="390" r="340" fill="url(#auraS)"/>
+  <circle cx="370" cy="390" r="256" fill="url(#moonS)" mask="url(#crescentS)"/>
+  <g opacity="0.96">
+    <line x1="562" y1="444" x2="698" y2="444" stroke="#ffffff" stroke-width="36" stroke-linecap="round"/>
+    <line x1="698" y1="444" x2="562" y2="564" stroke="#ffffff" stroke-width="36" stroke-linecap="round"/>
+    <line x1="562" y1="564" x2="698" y2="564" stroke="#ffffff" stroke-width="36" stroke-linecap="round"/>
+  </g>
+  <g opacity="0.68">
+    <line x1="668" y1="296" x2="764" y2="296" stroke="#ffffff" stroke-width="28" stroke-linecap="round"/>
+    <line x1="764" y1="296" x2="668" y2="384" stroke="#ffffff" stroke-width="28" stroke-linecap="round"/>
+    <line x1="668" y1="384" x2="764" y2="384" stroke="#ffffff" stroke-width="28" stroke-linecap="round"/>
+  </g>
+  <g opacity="0.38">
+    <line x1="746" y1="176" x2="808" y2="176" stroke="#ffffff" stroke-width="22" stroke-linecap="round"/>
+    <line x1="808" y1="176" x2="746" y2="234" stroke="#ffffff" stroke-width="22" stroke-linecap="round"/>
+    <line x1="746" y1="234" x2="808" y2="234" stroke="#ffffff" stroke-width="22" stroke-linecap="round"/>
+  </g>
+  <ellipse cx="668" cy="882" rx="68" ry="26" fill="#000000" opacity="0.22"/>
+  <path d="M668 664 C618 664 560 716 560 776 C560 858 668 964 668 964 C668 964 776 858 776 776 C776 716 718 664 668 664 Z" fill="#ff3b30"/>
+  <path d="M668 664 C618 664 560 716 560 776 C560 858 668 964 668 964 C668 964 776 858 776 776 C776 716 718 664 668 664 Z" fill="url(#pinSheenS)"/>
+  <circle cx="668" cy="776" r="40" fill="#ffffff"/>
+</svg>`;
+
+const row = document.getElementById('sizeRow');
+SIZES.forEach(({ px, label, radius }) => {
+  const cell = document.createElement('div');
+  cell.className = 'cell';
+  const wrap = document.createElement('div');
+  wrap.style.cssText = `width:${px}px;height:${px}px;border-radius:${radius}px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.6);flex-shrink:0`;
+  const img = document.createElement('img');
+  const blob = new Blob([svgSource], { type: 'image/svg+xml' });
+  img.src = URL.createObjectURL(blob);
+  img.style.cssText = `width:100%;height:100%;display:block`;
+  wrap.appendChild(img);
+  const lbl = document.createElement('div');
+  lbl.className = 'lbl';
+  lbl.textContent = label;
+  cell.appendChild(wrap);
+  cell.appendChild(lbl);
+  row.appendChild(cell);
+});
+
+// ── Export PNG ────────────────────────────────────────────────────
+function exportPng(size) {
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const blob = new Blob([svgSource], { type: 'image/svg+xml' });
+  const url = URL.createObjectURL(blob);
+  const img = new Image();
+  img.onload = () => {
+    ctx.drawImage(img, 0, 0, size, size);
+    URL.revokeObjectURL(url);
+    const a = document.createElement('a');
+    a.href = canvas.toDataURL('image/png');
+    a.download = `acordeaqui-icon-${size}.png`;
+    a.click();
+  };
+  img.src = url;
+}
+
+// ── Export SVG ────────────────────────────────────────────────────
+function exportSvg() {
+  const blob = new Blob([svgSource], { type: 'image/svg+xml' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'acordeaqui-icon.svg';
+  a.click();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+name: Domain Tests (Windows)
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  swift-test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Swift toolchain
+        shell: pwsh
+        run: |
+          winget install --id Swift.Toolchain --accept-source-agreements --accept-package-agreements --disable-interactivity --silent
+
+      - name: Add Swift to PATH
+        shell: pwsh
+        run: |
+          $userPath = (Get-ItemProperty "HKCU:\Environment").Path
+          $toolchain = ($userPath -split ";") | Where-Object { $_ -match "Toolchains" } | Select-Object -First 1
+          if (-not $toolchain) { throw "Swift toolchain not found in user PATH" }
+          Add-Content -Path $env:GITHUB_PATH -Value $toolchain
+          Write-Host "Swift bin: $toolchain"
+
+      - name: Test AcordeAquiDomain
+        shell: pwsh
+        run: swift test --package-path Packages/AcordeAquiDomain
+
+      - name: Test AcordeAquiData
+        shell: pwsh
+        run: swift test --package-path Packages/AcordeAquiData

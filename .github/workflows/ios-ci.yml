@@ -1,0 +1,31 @@
+name: iOS CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Domain tests (SwiftPM)
+        run: |
+          swift test --package-path Packages/AcordeAquiDomain
+          swift test --package-path Packages/AcordeAquiData
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Build app (iOS Simulator)
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -project AcordeAqui.xcodeproj \
+            -scheme AcordeAqui \
+            -destination 'platform=iOS Simulator,name=iPhone 15' \
+            CODE_SIGNING_ALLOWED=NO

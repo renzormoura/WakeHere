@@ -1,0 +1,21 @@
+# Swift / SPM
+.build/
+.swiftpm/
+DerivedData/
+*.xcuserstate
+
+# XcodeGen gera o projeto — não versionar
+*.xcodeproj
+!project.yml
+xcuserdata/
+
+# Build (IPA)
+build/
+
+# Freebuff / Kiro
+.freebuff/
+.kiro/
+
+# OS
+.DS_Store
+Thumbs.db
