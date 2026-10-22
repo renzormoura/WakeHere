@@ -39,7 +39,7 @@ final class CoreLocationTracker: NSObject, LocationTracking {
         super.init()
         manager.delegate = self
         manager.desiredAccuracy = kCLLocationAccuracyBest
-        manager.activityType = .automobileNavigation
+        manager.activityType = .automotiveNavigation
         manager.pausesLocationUpdatesAutomatically = false
         manager.showsBackgroundLocationIndicator = true
         authorizationStatus = manager.authorizationStatus

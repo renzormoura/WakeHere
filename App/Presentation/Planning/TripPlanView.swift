@@ -55,7 +55,7 @@ struct TripPlanView: View {
             }
             .frame(minHeight: 260)
             .onTapGesture { point in
-                let coordinate = proxy.convert(point, from: .local)
+                guard let coordinate = proxy.convert(point, from: .local) else { return }
                 vm.dropPin(at: Coordinate(coordinate))
             }
         }
