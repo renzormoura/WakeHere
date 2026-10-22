@@ -24,7 +24,7 @@ protocol LocationTracking: AnyObject {
 ///
 /// Responsável também pela geofence do destino (tripla trava do alarme):
 /// dispara mesmo se o iOS matar o app.
-final class CoreLocationTracker: NSObject, LocationTracking {
+final class CoreLocationTracker: NSObject, LocationTracking, ObservableObject {
     private let manager = CLLocationManager()
 
     @Published private(set) var authorizationStatus: CLAuthorizationStatus = .notDetermined

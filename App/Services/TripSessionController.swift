@@ -99,6 +99,11 @@ final class TripSessionController: ObservableObject, Identifiable {
     }
 
     private func startSensors() {
+        // A geofence do destino e o GPS em segundo plano exigem "Sempre".
+        if locationManager.authorizationStatus != .authorizedAlways {
+            locationManager.requestAlwaysAuthorization()
+        }
+
         Task {
             await alarms.requestAuthorization()
         }

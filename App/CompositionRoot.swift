@@ -71,7 +71,7 @@ final class CompositionRoot: ObservableObject {
         restored.resume()
     }
 
-    private func makeSession(for trip: Trip) -> TripSessionController {
+    private func makeSession(for trip: Trip, tracker: LocationTracking? = nil) -> TripSessionController {
         TripSessionController(
             trip: trip,
             configuration: .default,
@@ -79,7 +79,7 @@ final class CompositionRoot: ObservableObject {
             alarms: alarmScheduler,
             tripRepository: tripRepository,
             routeProvider: routeProvider,
-            locationManager: locationManager,
+            locationManager: tracker ?? locationManager,
             soundPlayer: soundPlayer,
             settings: currentSettings
         )
@@ -105,8 +105,19 @@ final class CompositionRoot: ObservableObject {
     /// Planeja a rota inicial (com tráfego via MKDirections) e inicia a sessão.
     /// O reroute periódico a cada 3 min fica a cargo do TripSessionController.
     func startTrip(destination: Destination, rule: any WakeUpRule) async {
+        // Modo simulação (Ajustes): percorre uma reta até o destino, sem GPS.
+        let tracker: LocationTracking
+        if UserDefaults.standard.bool(forKey: SimulationSettings.key) {
+            tracker = SimulatedLocationTracker(
+                start: SimulatedLocationTracker.defaultStart(for: destination.coordinate),
+                destination: destination.coordinate
+            )
+        } else {
+            tracker = locationManager
+        }
+
         var route: Route?
-        if let origin = locationManager.lastKnownCoordinate {
+        if let origin = tracker.lastKnownCoordinate {
             route = try? await routeProvider.planRoute(from: origin, to: destination)
         }
 
@@ -117,8 +128,13 @@ final class CompositionRoot: ObservableObject {
             now: clock.now
         )
 
-        let newSession = makeSession(for: trip)
+        let newSession = makeSession(for: trip, tracker: tracker)
         session = newSession
         newSession.begin()
     }
+}
+
+/// Chave do modo simulação (UserDefaults / `@AppStorage`).
+enum SimulationSettings {
+    static let key = "simulationEnabled"
 }

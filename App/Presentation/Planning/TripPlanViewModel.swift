@@ -86,6 +86,13 @@ final class TripPlanViewModel: ObservableObject {
             errorMessage = "Escolha um destino no mapa ou na busca."
             return
         }
+        let simulating = UserDefaults.standard.bool(forKey: SimulationSettings.key)
+        let status = root.locationManager.authorizationStatus
+        if !simulating, status == .denied || status == .restricted {
+            errorMessage = "A localização está desativada para o WakeHere. Ative em Ajustes do iPhone → WakeHere → Localização."
+            return
+        }
+
         isStarting = true
         defer { isStarting = false }
 

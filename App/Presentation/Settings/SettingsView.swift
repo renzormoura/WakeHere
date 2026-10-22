@@ -6,6 +6,7 @@ struct SettingsView: View {
     @EnvironmentObject private var root: CompositionRoot
     @State private var settings = AppSettings.default
     @State private var hasLoaded = false
+    @AppStorage(SimulationSettings.key) private var simulationEnabled = false
 
     var body: some View {
         NavigationStack {
@@ -55,6 +56,14 @@ struct SettingsView: View {
                     Toggle("Vibração", isOn: $settings.hapticsEnabled)
                 } header: {
                     Text("Alarme")
+                }
+
+                Section {
+                    Toggle("Modo simulação", isOn: $simulationEnabled)
+                } header: {
+                    Text("Teste")
+                } footer: {
+                    Text("Simula uma viagem de ~5 km a 90 km/h até o destino escolhido, sem usar o GPS. Serve para testar alarme, adiar e chegada sem sair de casa.")
                 }
 
                 Section {

@@ -12,6 +12,9 @@ struct TripTrackingView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 16) {
+                    if !UserDefaults.standard.bool(forKey: SimulationSettings.key) {
+                        LocationPermissionBanner(tracker: root.locationManager)
+                    }
                     phaseBanner
                     map
                     liveETACard
@@ -264,5 +267,40 @@ struct TripTrackingView: View {
         }
         .buttonStyle(.bordered)
         .controlSize(.large)
+    }
+}
+
+/// Avisa quando a localização não está em "Sempre": sem isso o alarme pode
+/// falhar com o app em segundo plano ou com o iPhone bloqueado.
+private struct LocationPermissionBanner: View {
+    @ObservedObject var tracker: CoreLocationTracker
+    @Environment(\.openURL) private var openURL
+
+    var body: some View {
+        if tracker.authorizationStatus != .authorizedAlways {
+            VStack(alignment: .leading, spacing: 8) {
+                Label(
+                    "Localização \"Sempre\" desativada",
+                    systemImage: "exclamationmark.triangle.fill"
+                )
+                .font(.headline)
+                .foregroundStyle(.orange)
+
+                Text("Sem ela, o alarme pode não tocar com o app em segundo plano ou o iPhone bloqueado. Em Ajustes, escolha Localização → Sempre.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+
+                Button("Abrir Ajustes") {
+                    if let url = URL(string: UIApplication.openSettingsURLString) {
+                        openURL(url)
+                    }
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.small)
+            }
+            .padding()
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(.orange.opacity(0.12), in: RoundedRectangle(cornerRadius: 12))
+        }
     }
 }
