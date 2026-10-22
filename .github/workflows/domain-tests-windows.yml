@@ -26,8 +26,18 @@ jobs:
 
       - name: Test WakeHereDomain
         shell: pwsh
-        run: swift test --package-path Packages/WakeHereDomain
+        run: |
+          $ErrorActionPreference = "Continue"
+          swift test --package-path Packages/WakeHereDomain 2>&1 | Tee-Object -FilePath domain.log
+          $code = $LASTEXITCODE
+          Select-String -Path domain.log -Pattern "error:|failed|fatal" | Select-Object -First 20 | ForEach-Object { Write-Host "::error::$($_.Line)" }
+          exit $code
 
       - name: Test WakeHereData
         shell: pwsh
-        run: swift test --package-path Packages/WakeHereData
+        run: |
+          $ErrorActionPreference = "Continue"
+          swift test --package-path Packages/WakeHereData 2>&1 | Tee-Object -FilePath data.log
+          $code = $LASTEXITCODE
+          Select-String -Path data.log -Pattern "error:|failed|fatal" | Select-Object -First 20 | ForEach-Object { Write-Host "::error::$($_.Line)" }
+          exit $code

@@ -23,9 +23,15 @@ jobs:
 
       - name: Build app (iOS Simulator)
         run: |
-          set -o pipefail
+          set +e
           xcodebuild build \
             -project WakeHere.xcodeproj \
             -scheme WakeHere \
             -destination 'platform=iOS Simulator,name=iPhone 15' \
-            CODE_SIGNING_ALLOWED=NO
+            CODE_SIGNING_ALLOWED=NO 2>&1 | tee build.log
+          status=${PIPESTATUS[0]}
+          # Expõe os erros como annotations (visíveis sem abrir os logs).
+          grep -E "error:" build.log | sort -u | head -20 | while IFS= read -r line; do
+            echo "::error::${line}"
+          done
+          exit $status
