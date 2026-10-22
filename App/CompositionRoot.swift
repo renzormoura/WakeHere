@@ -45,6 +45,44 @@ final class CompositionRoot: ObservableObject {
         locationManager = CoreLocationTracker()
         soundPlayer = AlarmSoundPlayer()
         planViewModel = TripPlanViewModel(searcher: placeSearcher)
+
+        restoreActiveTrip()
+    }
+
+    /// Viagens ativas mais antigas que isto são tratadas como abandonadas.
+    private static let maxResumableAge: TimeInterval = 24 * 3600
+
+    /// Se o app foi encerrado/relançado no meio de uma viagem (ex.: o iOS o
+    /// relançou pela geofence), retoma a viagem em vez de começar do zero.
+    private func restoreActiveTrip() {
+        guard let trips = try? tripRepository.fetchAll(),
+              let active = trips.last(where: { $0.phase.isActive }) else { return }
+
+        let reference = active.startedAt ?? active.createdAt
+        guard clock.now.timeIntervalSince(reference) < CompositionRoot.maxResumableAge else {
+            active.phase = .cancelled
+            active.finishedAt = clock.now
+            try? tripRepository.save(active)
+            return
+        }
+
+        let restored = makeSession(for: active)
+        session = restored
+        restored.resume()
+    }
+
+    private func makeSession(for trip: Trip) -> TripSessionController {
+        TripSessionController(
+            trip: trip,
+            configuration: .default,
+            planner: AlarmTimingPlanner(clock: clock),
+            alarms: alarmScheduler,
+            tripRepository: tripRepository,
+            routeProvider: routeProvider,
+            locationManager: locationManager,
+            soundPlayer: soundPlayer,
+            settings: currentSettings
+        )
     }
 
     /// Tenta o diretório padrão; se falhar, usa o temporário.
@@ -79,17 +117,7 @@ final class CompositionRoot: ObservableObject {
             now: clock.now
         )
 
-        let newSession = TripSessionController(
-            trip: trip,
-            configuration: .default,
-            planner: AlarmTimingPlanner(clock: clock),
-            alarms: alarmScheduler,
-            tripRepository: tripRepository,
-            routeProvider: routeProvider,
-            locationManager: locationManager,
-            soundPlayer: soundPlayer,
-            settings: currentSettings
-        )
+        let newSession = makeSession(for: trip)
         session = newSession
         newSession.begin()
     }

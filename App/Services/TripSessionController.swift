@@ -82,6 +82,23 @@ final class TripSessionController: ObservableObject, Identifiable {
 
     /// Começa a acompanhar a viagem (permissões + GPS + geofence + reroute periódico).
     func begin() {
+        startSensors()
+        monitor.start()
+        startPeriodicReroute()
+        save()
+    }
+
+    /// Retoma uma viagem que já estava ativa (app relançado pelo iOS, por
+    /// exemplo pela geofence do destino): religa GPS e geofence sem reiniciar a fase.
+    func resume() {
+        startSensors()
+        startPeriodicReroute()
+        if phase == .ringing {
+            presentAlarm()
+        }
+    }
+
+    private func startSensors() {
         Task {
             await alarms.requestAuthorization()
         }
@@ -102,10 +119,6 @@ final class TripSessionController: ObservableObject, Identifiable {
                 self?.handleDestinationGeofence()
             }
         }
-
-        monitor.start()
-        startPeriodicReroute()
-        save()
     }
 
     // MARK: - Comandos da UI
@@ -115,6 +128,8 @@ final class TripSessionController: ObservableObject, Identifiable {
         isAlarmVisible = false
         soundPlayer.stop()
         monitor.stopAlarm()
+        // O toque parou o reroute periódico; se a viagem segue, retoma.
+        if phase.isActive { startPeriodicReroute() }
     }
 
     /// Adia o alarme (padrão: 3 min) com trava de segurança agendada.
@@ -293,6 +308,11 @@ extension TripSessionController: TripMonitorDelegate {
             title: "Hora de descer!",
             body: "\(trip.destination.name) está logo ali."
         )
+        presentAlarm()
+    }
+
+    /// Mostra a tela de alarme e liga som e vibração.
+    private func presentAlarm() {
         isAlarmVisible = true
 
         if settings.soundEnabled {

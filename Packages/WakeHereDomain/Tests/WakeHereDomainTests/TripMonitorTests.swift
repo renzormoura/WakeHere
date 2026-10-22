@@ -141,6 +141,43 @@ final class TripMonitorTests: XCTestCase {
         XCTAssertEqual(monitor.phase, .tracking)
     }
 
+    func testStoppedAlarmDoesNotRingAgainOnNextUpdate() {
+        let monitor = makeMonitor(rule: TimeBeforeArrivalRule(threshold: .minutes(1)))
+        monitor.start(at: currentTime)
+        monitor.process(location: TestFactory.coordinate(atFraction: 0.85), speed: cruiseSpeed, timestamp: tick(10))
+        monitor.stopAlarm(at: currentTime)
+        XCTAssertEqual(monitor.phase, .tracking)
+
+        // A regra continua satisfeita, mas o usuário já parou o alarme.
+        monitor.process(location: TestFactory.coordinate(atFraction: 0.9), speed: cruiseSpeed, timestamp: tick(10))
+        XCTAssertEqual(monitor.phase, .tracking)
+        XCTAssertEqual(delegate.alarmTriggers, 1)
+
+        // Chegar ao destino ainda toca.
+        monitor.process(location: TestFactory.coordinate(atFraction: 0.99), speed: cruiseSpeed, timestamp: tick(10))
+        XCTAssertEqual(monitor.phase, .ringing)
+        XCTAssertEqual(delegate.alarmTriggers, 2)
+    }
+
+    func testUpdateRouteRecalibratesETAWithTrafficAwareDuration() {
+        let monitor = makeMonitor(rule: TimeBeforeArrivalRule(threshold: .minutes(1)))
+        monitor.start(at: currentTime)
+        let before = try! XCTUnwrap(monitor.process(
+            location: TestFactory.coordinate(atFraction: 0.5), speed: cruiseSpeed, timestamp: tick(10)))
+
+        // Trânsito: a mesma distância agora leva o dobro do tempo.
+        let route = try! XCTUnwrap(monitor.trip.route)
+        monitor.updateRoute(Route(
+            polyline: route.polyline,
+            totalDistance: route.totalDistance,
+            expectedDuration: Seconds(route.expectedDuration.value * 2),
+            destination: route.destination
+        ))
+        let after = try! XCTUnwrap(monitor.process(
+            location: TestFactory.coordinate(atFraction: 0.5), speed: cruiseSpeed, timestamp: tick(10)))
+        XCTAssertGreaterThan(after.estimatedRemainingSeconds.value, before.estimatedRemainingSeconds.value * 1.3)
+    }
+
     func testSnoozeDefersAlarmAndReTriggersAtDeadline() {
         let monitor = makeMonitor(rule: TimeBeforeArrivalRule(threshold: .minutes(1)))
         monitor.start(at: currentTime)

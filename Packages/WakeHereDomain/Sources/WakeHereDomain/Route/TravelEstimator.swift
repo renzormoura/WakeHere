@@ -22,6 +22,15 @@ public final class TravelEstimator {
         self.init(initialSpeed: MetersPerSecond(average))
     }
 
+    /// Reinicia a velocidade média a partir de uma rota recém-planejada
+    /// (cujo `expectedDuration` reflete o trânsito atual).
+    public func recalibrate(with route: Route) {
+        guard route.expectedDuration.value > 0, route.totalDistance.value > 0 else { return }
+        averageSpeed = MetersPerSecond(
+            max(route.totalDistance.value / route.expectedDuration.value, 0.1)
+        )
+    }
+
     /// Registra uma amostra de velocidade (ignora valores inválidos).
     public func registerSample(speed: MetersPerSecond) {
         guard speed.value.isFinite, speed.value >= 0 else { return }

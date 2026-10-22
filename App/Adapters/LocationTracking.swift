@@ -33,6 +33,7 @@ final class CoreLocationTracker: NSObject, LocationTracking {
     private var onUpdate: ((Coordinate, MetersPerSecond, Date) -> Void)?
     private var onDestinationEntry: (() -> Void)?
     private var wantsUpdates = false
+    private var pendingDestination: (coordinate: Coordinate, radius: Meters)?
 
     override init() {
         super.init()
@@ -77,25 +78,34 @@ final class CoreLocationTracker: NSObject, LocationTracking {
         radius: Meters,
         onEntry: @escaping () -> Void
     ) {
-        guard authorizationStatus == .authorizedAlways else { return }
         onDestinationEntry = onEntry
+        pendingDestination = (coordinate, radius)
+        registerPendingDestinationIfPossible()
+    }
+
+    func stopMonitoringDestination() {
+        pendingDestination = nil
+        for region in manager.monitoredRegions {
+            manager.stopMonitoring(for: region)
+        }
+        onDestinationEntry = nil
+    }
+
+    /// Registra a geofence assim que a permissão *Always* existir — se ela só
+    /// chegar depois do início da viagem, a região entra então.
+    private func registerPendingDestinationIfPossible() {
+        guard let pending = pendingDestination,
+              manager.authorizationStatus == .authorizedAlways else { return }
         let region = CLCircularRegion(
-            center: coordinate.clLocationCoordinate,
-            radius: max(radius.value, 100),
+            center: pending.coordinate.clLocationCoordinate,
+            radius: max(pending.radius.value, 100),
             identifier: "destination"
         )
         region.notifyOnEntry = true
         region.notifyOnExit = false
         manager.startMonitoring(for: region)
-        // Dispara imediatamente se o usuário já estiver dentro do raio.
+        // Resposta chega em `didDetermineState` (se já estiver dentro do raio).
         manager.requestState(for: region)
-    }
-
-    func stopMonitoringDestination() {
-        for region in manager.monitoredRegions {
-            manager.stopMonitoring(for: region)
-        }
-        onDestinationEntry = nil
     }
 
     private func activateIfAuthorized() {
@@ -118,6 +128,12 @@ extension CoreLocationTracker: CLLocationManagerDelegate {
             self.authorizationStatus = status
         }
         activateIfAuthorized()
+        registerPendingDestinationIfPossible()
+    }
+
+    func locationManager(_ manager: CLLocationManager, didDetermineState state: CLRegionState, for region: CLRegion) {
+        guard region.identifier == "destination", state == .inside else { return }
+        onDestinationEntry?()
     }
 
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {

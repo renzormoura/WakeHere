@@ -17,6 +17,8 @@ public final class TripMonitor {
     private var snoozeDeadline: Date?
     /// Chegada confirmada por evento externo (geofence).
     private var arrivalConfirmed = false
+    /// O usuário já parou o alarme da regra: só a chegada volta a tocar.
+    private var ruleAlarmDismissed = false
 
     public init(trip: Trip, configuration: MonitorConfiguration = .default) {
         self.trip = trip
@@ -113,6 +115,9 @@ public final class TripMonitor {
         guard machine.phase == .tracking || machine.phase == .warning else {
             return snapshot
         }
+        // Alarme da regra já parado: sem isso a regra, ainda satisfeita,
+        // tocaria de novo no próximo update de GPS.
+        guard !ruleAlarmDismissed else { return snapshot }
 
         if trip.rule.evaluate(with: snapshot) == .triggered {
             triggerAlarm()
@@ -137,6 +142,7 @@ public final class TripMonitor {
             trip.finishedAt = date
             transition(to: .arrived)
         } else {
+            ruleAlarmDismissed = true
             transition(to: .tracking)
         }
     }
@@ -167,6 +173,8 @@ public final class TripMonitor {
     /// Nova rota (reroute concluído pelo adaptador de mapas).
     public func updateRoute(_ route: Route) {
         trip.route = route
+        // O tempo esperado da nova rota carrega o trânsito atual: recalibra o ETA.
+        estimator.recalibrate(with: route)
         lastRerouteRequest = nil
     }
 
