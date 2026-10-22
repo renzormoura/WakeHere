@@ -31,6 +31,7 @@
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>
+		<string>audio</string>
 	</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>O WakeHere usa sua localização para acompanhar a viagem e calcular quanto falta até o ponto em que você quer acordar.</string>

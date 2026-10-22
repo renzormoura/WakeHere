@@ -127,6 +127,9 @@ final class TripSessionController: ObservableObject, Identifiable {
     func stopAlarm() {
         isAlarmVisible = false
         soundPlayer.stop()
+        // Interrompe a cadeia de notificações repetidas.
+        alarms.cancelScheduledAlarm()
+        lastScheduledFireDate = nil
         monitor.stopAlarm()
         // O toque parou o reroute periódico; se a viagem segue, retoma.
         if phase.isActive { startPeriodicReroute() }
@@ -140,6 +143,7 @@ final class TripSessionController: ObservableObject, Identifiable {
         let deadline = Date().addingTimeInterval(TimeInterval(minutes * 60))
         monitor.snooze(until: deadline)
         lastScheduledFireDate = nil
+        alarms.cancelScheduledAlarm()
 
         // Mesmo que o app morra durante o snooze, a notificação toca no prazo.
         alarms.scheduleAlarm(
