@@ -1,7 +1,7 @@
 import Foundation
 import Combine
 import CoreLocation
-import AcordeAquiDomain
+import WakeHereDomain
 
 /// Porta de localização usada pela sessão da viagem (implementação: CoreLocation).
 protocol LocationTracking: AnyObject {

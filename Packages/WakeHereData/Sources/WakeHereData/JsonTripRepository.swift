@@ -1,12 +1,12 @@
 import Foundation
-import AcordeAquiDomain
+import WakeHereDomain
 
 /// **Repository** concreto: histórico de viagens em `trips.json` (Codable).
 ///
 /// 100% local, sem servidor. Acesso serializado por fila para segurança.
 public final class JsonTripRepository: TripRepository {
     private let fileURL: URL
-    private let queue = DispatchQueue(label: "com.acordeaqui.trips")
+    private let queue = DispatchQueue(label: "com.wakehere.trips")
     private let encoder: JSONEncoder
     private let decoder: JSONDecoder
 

@@ -5,7 +5,7 @@
 
 ## Contexto
 
-O AcordeAqui calcula o ETA usando o `TravelEstimator`, uma média exponencial
+O WakeHere calcula o ETA usando o `TravelEstimator`, uma média exponencial
 (EMA) da velocidade GPS observada. Essa abordagem tem uma limitação crítica:
 ela extrapola a velocidade atual do veículo e não enxerga o trânsito à frente.
 Se o ônibus está a 60 km/h mas há congestionamento 2 km adiante, o ETA fica
@@ -64,7 +64,7 @@ independente via `tripMonitorDidRequestReroute`, sem alterar o timer periódico.
 
 **Positivas:**
 - ETA com tráfego ao vivo sem nenhum custo ou dependência externa
-- Zero mudança na arquitetura de domínio (`AcordeAquiDomain` inalterado)
+- Zero mudança na arquitetura de domínio (`WakeHereDomain` inalterado)
 - Zero configuração por parte do usuário ou do desenvolvedor
 - Funciona em todos os iPhones com iOS 17+, offline degradada para EMA
 

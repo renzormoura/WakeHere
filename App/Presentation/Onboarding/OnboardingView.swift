@@ -25,13 +25,13 @@ struct OnboardingView: View {
         Point(
             symbol: "bell.and.waves.left.and.right",
             title: "Durma tranquilo",
-            detail: "O AcordeAqui acompanha a viagem em segundo plano e dispara o alarme na hora certa — mesmo com o iPhone bloqueado."
+            detail: "O WakeHere acompanha a viagem em segundo plano e dispara o alarme na hora certa — mesmo com o iPhone bloqueado."
         )
     ]
 
     var body: some View {
         VStack(spacing: 24) {
-            Text("AcordeAqui")
+            Text("WakeHere")
                 .font(.largeTitle.bold())
                 .padding(.top, 32)
 

@@ -1,6 +1,6 @@
 import XCTest
-import AcordeAquiDomain
-@testable import AcordeAquiData
+import WakeHereDomain
+@testable import WakeHereData
 
 final class JsonSettingsRepositoryTests: XCTestCase {
     private var directory: URL!
@@ -8,7 +8,7 @@ final class JsonSettingsRepositoryTests: XCTestCase {
 
     override func setUpWithError() throws {
         directory = FileManager.default.temporaryDirectory
-            .appendingPathComponent("acordeaqui-settings-\(UUID().uuidString)")
+            .appendingPathComponent("wakehere-settings-\(UUID().uuidString)")
         repository = try JsonSettingsRepository(directory: directory)
     }
 

@@ -1,5 +1,5 @@
 import Foundation
-import AcordeAquiDomain
+import WakeHereDomain
 
 /// Leitura/escrita JSON em arquivo (helper interno do pacote Data).
 enum JsonFileStore {

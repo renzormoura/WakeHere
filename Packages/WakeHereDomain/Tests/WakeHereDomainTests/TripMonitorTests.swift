@@ -1,5 +1,5 @@
 import XCTest
-@testable import AcordeAquiDomain
+@testable import WakeHereDomain
 
 final class TripMonitorTests: XCTestCase {
     private var delegate: SpyMonitorDelegate!

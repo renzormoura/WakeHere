@@ -1,5 +1,5 @@
 import XCTest
-@testable import AcordeAquiDomain
+@testable import WakeHereDomain
 
 final class RouteGeometryTests: XCTestCase {
     // Reta horizontal (mesma latitude) de ~1 km.

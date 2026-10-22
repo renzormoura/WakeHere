@@ -1,6 +1,6 @@
 import Foundation
 import UserNotifications
-import AcordeAquiDomain
+import WakeHereDomain
 
 /// **Adapter** — notificações locais (camada 1 da tripla trava).
 ///
@@ -8,9 +8,9 @@ import AcordeAquiDomain
 /// toca mesmo com o iPhone bloqueado e o app em segundo plano.
 final class NotificationAlarmScheduler: NSObject, AlarmScheduling {
     private let center = UNUserNotificationCenter.current()
-    private let pendingIdentifier = "com.acordeaqui.alarm.pending"
-    private let immediateIdentifier = "com.acordeaqui.alarm.immediate"
-    private let snoozeIdentifier = "com.acordeaqui.alarm.snooze"
+    private let pendingIdentifier = "com.wakehere.alarm.pending"
+    private let immediateIdentifier = "com.wakehere.alarm.immediate"
+    private let snoozeIdentifier = "com.wakehere.alarm.snooze"
 
     override init() {
         super.init()

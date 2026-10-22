@@ -1,4 +1,4 @@
-# 05 — Instalando o AcordeAqui no iPhone (Sideloadly + iTunes)
+# 05 — Instalando o WakeHere no iPhone (Sideloadly + iTunes)
 
 Fluxo completo para usar o app **sem ter um Mac**: o CI gera o `.ipa` e você
 instala no iPhone pelo Windows.
@@ -8,7 +8,7 @@ instala no iPhone pelo Windows.
 1. Envie o repositório para o GitHub (repositório **público** = minutos de
    macOS gratuitos e ilimitados).
 2. No GitHub: **Actions → Build IPA (Sideloadly) → Run workflow**.
-3. Ao terminar (alguns minutos), baixe o artifact **`AcordeAqui.ipa`** na
+3. Ao terminar (alguns minutos), baixe o artifact **`WakeHere.ipa`** na
    página da execução (aba *Summary*, seção *Artifacts*).
 
 > O `.ipa` sai **sem assinatura** de propósito: o Sideloadly assina com a
@@ -27,12 +27,12 @@ instala no iPhone pelo Windows.
 ## Passo 3 — Sideloadar
 
 1. Abra o **Sideloadly** (se pedir Apple ID, use o mesmo da conta do iPhone).
-2. Arraste o `AcordeAqui.ipa` para a área do arquivo, selecione o iPhone na
+2. Arraste o `WakeHere.ipa` para a área do arquivo, selecione o iPhone na
    lista de dispositivos.
 3. Clique em **Start**. Aguarde assinar e instalar.
 4. No iPhone: **Ajustes → Geral → VPN e Gerenciamento de Dispositivo** →
    confie no desenvolvedor (perfil da sua Apple ID).
-5. Abra o **AcordeAqui**.
+5. Abra o **WakeHere**.
 
 ## Passo 4 — Conceder permissões
 
@@ -55,9 +55,9 @@ instala no iPhone pelo Windows.
 
 Confirme que a re-assinatura não perdeu capacidades:
 
-- [ ] **Notificações:** Ajustes → Notificações → AcordeAqui aparece e está ligado.
+- [ ] **Notificações:** Ajustes → Notificações → WakeHere aparece e está ligado.
 - [ ] **Localização:** Ajustes → Privacidade → Serviços de Localização →
-      AcordeAqui = **Sempre**.
+      WakeHere = **Sempre**.
 - [ ] **Teste de alarme:** crie uma viagem curta com regra de 1 min e
       deixe a tela bloqueada — a notificação deve tocar.
 - [ ] **Som:** a tela de alarme toca o tom (`AlarmTone.wav`); se o iOS
@@ -70,10 +70,10 @@ Confirme que a re-assinatura não perdeu capacidades:
   reinstale.
 - *Notificação não toca como "time-sensitive":* o entitlement
   `com.apple.developer.usernotifications.time-sensitive` (em
-  `App/AcordeAqui.entitlements`) precisa estar no perfil — o Sideloadly
+  `App/WakeHere.entitlements`) precisa estar no perfil — o Sideloadly
   normalmente o mantém; some capacidade? refaça o sideload e teste novamente.
 
 ## Desinstalar
 
 Segure o ícone → **Remover app** (os dados locais em
-`Documentos/AcordeAqui/` vão junto).
+`Documentos/WakeHere/` vão junto).

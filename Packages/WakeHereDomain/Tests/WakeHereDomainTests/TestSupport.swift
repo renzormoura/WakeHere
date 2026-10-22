@@ -1,6 +1,6 @@
 import Foundation
 import XCTest
-@testable import AcordeAquiDomain
+@testable import WakeHereDomain
 
 // MARK: - Fábricas de objetos de teste
 

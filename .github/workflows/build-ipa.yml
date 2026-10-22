@@ -1,6 +1,6 @@
 name: Build IPA (Sideloadly)
 
-# Gera o AcordeAqui.ipa SEM assinatura.
+# Gera o WakeHere.ipa SEM assinatura.
 # Baixe o artifact e instale no iPhone via Sideloadly + iTunes no Windows.
 on:
   workflow_dispatch:
@@ -20,24 +20,24 @@ jobs:
       - name: Archive (Release, sem assinatura)
         run: |
           xcodebuild archive \
-            -project AcordeAqui.xcodeproj \
-            -scheme AcordeAqui \
+            -project WakeHere.xcodeproj \
+            -scheme WakeHere \
             -configuration Release \
             -destination 'generic/platform=iOS' \
-            -archivePath build/AcordeAqui.xcarchive \
+            -archivePath build/WakeHere.xcarchive \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO
 
       - name: Package .ipa
         run: |
           mkdir -p build/Payload
-          cp -R build/AcordeAqui.xcarchive/Products/Applications/*.app build/Payload/
+          cp -R build/WakeHere.xcarchive/Products/Applications/*.app build/Payload/
           cd build
-          zip -qry AcordeAqui.ipa Payload
+          zip -qry WakeHere.ipa Payload
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: AcordeAqui.ipa
-          path: build/AcordeAqui.ipa
+          name: WakeHere.ipa
+          path: build/WakeHere.ipa
           if-no-files-found: error

@@ -1,5 +1,5 @@
 import SwiftUI
-import AcordeAquiDomain
+import WakeHereDomain
 
 /// Histórico de viagens (lido do `TripRepository`).
 struct HistoryView: View {

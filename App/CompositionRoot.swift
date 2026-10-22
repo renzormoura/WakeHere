@@ -1,6 +1,6 @@
 import Foundation
-import AcordeAquiDomain
-import AcordeAquiData
+import WakeHereDomain
+import WakeHereData
 
 /// **Composition Root** — único lugar que conhece as implementações concretas.
 ///
@@ -24,9 +24,9 @@ final class CompositionRoot: ObservableObject {
     init() {
         let base = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
             ?? FileManager.default.temporaryDirectory
-        let directory = base.appendingPathComponent("AcordeAqui", isDirectory: true)
+        let directory = base.appendingPathComponent("WakeHere", isDirectory: true)
         let fallbackDirectory = FileManager.default.temporaryDirectory
-            .appendingPathComponent("AcordeAqui-fallback", isDirectory: true)
+            .appendingPathComponent("WakeHere-fallback", isDirectory: true)
 
         tripRepository = CompositionRoot.resolve(
             default: { try JsonTripRepository(directory: directory) },

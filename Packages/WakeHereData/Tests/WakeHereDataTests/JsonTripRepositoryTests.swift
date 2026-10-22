@@ -1,6 +1,6 @@
 import XCTest
-import AcordeAquiDomain
-@testable import AcordeAquiData
+import WakeHereDomain
+@testable import WakeHereData
 
 final class JsonTripRepositoryTests: XCTestCase {
     private var directory: URL!
@@ -8,7 +8,7 @@ final class JsonTripRepositoryTests: XCTestCase {
 
     override func setUpWithError() throws {
         directory = FileManager.default.temporaryDirectory
-            .appendingPathComponent("acordeaqui-trips-\(UUID().uuidString)")
+            .appendingPathComponent("wakehere-trips-\(UUID().uuidString)")
         repository = try JsonTripRepository(directory: directory)
     }
 

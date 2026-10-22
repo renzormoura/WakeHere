@@ -1,4 +1,4 @@
-# 03 — Algoritmo: como o AcordeAqui decide "hora de acordar"
+# 03 — Algoritmo: como o WakeHere decide "hora de acordar"
 
 ## 3.1 Pipeline por atualização de GPS
 
@@ -101,7 +101,7 @@ a notificação de mesmo modo toca.
 
 **Nível time-sensitive:** requer o entitlement
 `com.apple.developer.usernotifications.time-sensitive` (versionado em
-`App/AcordeAqui.entitlements`) e a autorização
+`App/WakeHere.entitlements`) e a autorização
 `requestAuthorization(options: [.alert, .sound, .timeSensitive])`.
 
 ## 3.8 Bateria e permissões

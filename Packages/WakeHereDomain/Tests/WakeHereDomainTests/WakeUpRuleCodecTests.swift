@@ -1,5 +1,5 @@
 import XCTest
-@testable import AcordeAquiDomain
+@testable import WakeHereDomain
 
 final class WakeUpRuleCodecTests: XCTestCase {
     func testRoundTripPreservesTimeRule() throws {

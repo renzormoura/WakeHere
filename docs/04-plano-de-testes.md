@@ -7,8 +7,8 @@ qualquer SO com `swift test` — sem simulador, sem GPS, sem Mac.
 
 | Camada | Ferramento | Onde roda |
 |---|---|---|
-| `AcordeAquiDomain` | XCTest (`swift test`) | Windows local, CI Windows, CI macOS |
-| `AcordeAquiData` | XCTest + diretório temporário por teste | idem |
+| `WakeHereDomain` | XCTest (`swift test`) | Windows local, CI Windows, CI macOS |
+| `WakeHereData` | XCTest + diretório temporário por teste | idem |
 | App (UI/build) | compilação no CI (simulador) + teste manual no iPhone via IPA | CI macOS + dispositivo real |
 
 **Técnicas usadas:** casos-limite (boundary values), testes de transição de
@@ -86,8 +86,8 @@ distância) e testes derobustez a arquivo corrompido.
 ## Como rodar
 
 ```bash
-swift test --package-path Packages/AcordeAquiDomain
-swift test --package-path Packages/AcordeAquiData
+swift test --package-path Packages/WakeHereDomain
+swift test --package-path Packages/WakeHereData
 ```
 
 No CI (`.github/workflows/`):

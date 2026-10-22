@@ -7,10 +7,10 @@
    UI (SwiftUI)  →  │ App/          Presentation · Services ·      │
                     │               Adapters · CompositionRoot     │
                     ├──────────────────────────────────────────────┤
-   Persistência  →  │ AcordeAquiData   JsonTripRepository ·        │
+   Persistência  →  │ WakeHereData   JsonTripRepository ·        │
                     │                 JsonSettingsRepository       │
                     ├──────────────────────────────────────────────┤
-   Regras/Negócio → │ AcordeAquiDomain Entidades · Strategies ·    │
+   Regras/Negócio → │ WakeHereDomain Entidades · Strategies ·    │
                     │                 Estado · Geometria · ETA ·   │
                     │                 Alarme · Portas (protocolos) │
                     └──────────────────────────────────────────────┘
@@ -41,7 +41,7 @@ implementadas na camada de App:
 | **State** | `Trip/TripStateMachine.swift` | tabela explícita de transições legais (`planned → tracking → warning → ringing → …`); transições ilegais são rejeitadas |
 | **Observer** | `Trip/TripMonitorDelegate.swift` | o monitor notifica snapshots, fases, reroutes e gatilhos; observadores implementam só o que precisam (implementações vazias padrão) |
 | **Adapter** | `App/Adapters/*` | embrulham MapKit/CoreLocation/UserNotifications atrás de portas do domínio |
-| **Repository** | `Persistence/Repositories.swift` + `AcordeAquiData` | CRUD de viagens/configurações atrás de interface; trocar JSON por CoreData/SwiftData não afeta o domínio |
+| **Repository** | `Persistence/Repositories.swift` + `WakeHereData` | CRUD de viagens/configurações atrás de interface; trocar JSON por CoreData/SwiftData não afeta o domínio |
 | **Factory** | `Trip/TripFactory.swift` | cria `Trip` e regras a partir da configuração do usuário (inclui conversão imperial/métrico) |
 | **Facade** | `App/Services/TripSessionController.swift` | uma única API (`begin/stopAlarm/snooze/cancelTrip`) escondendo monitor + localização + notificações + som + persistência |
 | **Proxy (cache)** | `TripSessionController.rescheduleNotificationIfNeeded` | só reescreve a notificação quando o horário mudou >15 s (evita I/O a cada update de GPS) |

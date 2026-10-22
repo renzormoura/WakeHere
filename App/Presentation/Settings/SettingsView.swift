@@ -1,5 +1,5 @@
 import SwiftUI
-import AcordeAquiDomain
+import WakeHereDomain
 
 /// Ajustes do app (persistidos pelo `SettingsRepository`).
 struct SettingsView: View {
@@ -60,7 +60,7 @@ struct SettingsView: View {
                 Section {
                     LabeledContent("Versão", value: "1.0.0")
                     Text(
-                        "O AcordeAqui usa sua localização durante a viagem para calcular o tempo e a distância até o destino. Nada é enviado para servidores."
+                        "O WakeHere usa sua localização durante a viagem para calcular o tempo e a distância até o destino. Nada é enviado para servidores."
                     )
                     .font(.caption)
                     .foregroundStyle(.secondary)

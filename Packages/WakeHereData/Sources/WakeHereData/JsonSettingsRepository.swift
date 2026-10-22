@@ -1,12 +1,12 @@
 import Foundation
-import AcordeAquiDomain
+import WakeHereDomain
 
 /// **Repository** concreto: configurações em `settings.json`.
 ///
 /// Arquivo ausente ou corrompido → cai nos padrões (nunca quebra o app).
 public final class JsonSettingsRepository: SettingsRepository {
     private let fileURL: URL
-    private let queue = DispatchQueue(label: "com.acordeaqui.settings")
+    private let queue = DispatchQueue(label: "com.wakehere.settings")
     private let encoder: JSONEncoder
     private let decoder: JSONDecoder
 

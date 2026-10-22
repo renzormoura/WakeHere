@@ -1,5 +1,5 @@
 import XCTest
-@testable import AcordeAquiDomain
+@testable import WakeHereDomain
 
 final class TripCodableTests: XCTestCase {
     func testRoundTripPreservesEverything() throws {

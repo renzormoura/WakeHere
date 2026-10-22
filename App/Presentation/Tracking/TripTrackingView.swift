@@ -1,6 +1,6 @@
 import SwiftUI
 import MapKit
-import AcordeAquiDomain
+import WakeHereDomain
 
 /// Acompanhamento da viagem ativa: mapa, contadores e controles.
 struct TripTrackingView: View {

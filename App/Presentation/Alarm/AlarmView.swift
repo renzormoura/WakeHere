@@ -1,5 +1,5 @@
 import SwiftUI
-import AcordeAquiDomain
+import WakeHereDomain
 
 /// Tela de alarme em tela cheia (exibida no momento do gatilho).
 struct AlarmView: View {

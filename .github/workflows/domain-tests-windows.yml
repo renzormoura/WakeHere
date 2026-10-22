@@ -24,10 +24,10 @@ jobs:
           Add-Content -Path $env:GITHUB_PATH -Value $toolchain
           Write-Host "Swift bin: $toolchain"
 
-      - name: Test AcordeAquiDomain
+      - name: Test WakeHereDomain
         shell: pwsh
-        run: swift test --package-path Packages/AcordeAquiDomain
+        run: swift test --package-path Packages/WakeHereDomain
 
-      - name: Test AcordeAquiData
+      - name: Test WakeHereData
         shell: pwsh
-        run: swift test --package-path Packages/AcordeAquiData
+        run: swift test --package-path Packages/WakeHereData

@@ -1,6 +1,6 @@
 import SwiftUI
 import MapKit
-import AcordeAquiDomain
+import WakeHereDomain
 
 /// Tela de planejamento: mapa + busca + regra de despertar.
 struct TripPlanView: View {

@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>pt_BR</string>
 	<key>CFBundleDisplayName</key>
-	<string>AcordeAqui</string>
+	<string>WakeHere</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -33,7 +33,7 @@
 		<string>location</string>
 	</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>O AcordeAqui usa sua localização para acompanhar a viagem e calcular quanto falta até o ponto em que você quer acordar.</string>
+	<string>O WakeHere usa sua localização para acompanhar a viagem e calcular quanto falta até o ponto em que você quer acordar.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Para acordar você no ponto certo mesmo com o app em segundo plano e o iPhone bloqueado, precisamos de localização em segundo plano. A localização só é usada durante a viagem ativa.</string>
 </dict>

@@ -1,5 +1,5 @@
 import CoreLocation
-import AcordeAquiDomain
+import WakeHereDomain
 
 extension Coordinate {
     /// Converte para o tipo do CoreLocation/MapKit.

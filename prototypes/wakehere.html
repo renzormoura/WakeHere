@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AcordeAqui — Protótipo interativo</title>
+<title>WakeHere — Protótipo interativo</title>
 <style>
   :root, body[data-theme="light"] {
     --page-bg: #e9ecf2;
@@ -413,7 +413,7 @@
 
 <div class="page-head">
   <div>
-    <h1>AcordeAqui — protótipo interativo</h1>
+    <h1>WakeHere — protótipo interativo</h1>
     <div class="sub">Clique para navegar: mapa, busca, regra, viagem e alarme funcionam.</div>
   </div>
   <button class="theme-btn" id="btnTheme">🌙 Escuro</button>
@@ -572,7 +572,7 @@
               <div class="row"><span>Versão</span><span class="val">1.0.0</span></div>
               <div class="sep"></div>
               <div class="row" style="align-items:flex-start">
-                <p class="footer" style="margin:0">O AcordeAqui usa sua localização durante a viagem para calcular o tempo e a distância até o destino. Nada é enviado para servidores.</p>
+                <p class="footer" style="margin:0">O WakeHere usa sua localização durante a viagem para calcular o tempo e a distância até o destino. Nada é enviado para servidores.</p>
               </div>
             </div>
           </div>
@@ -1311,7 +1311,7 @@
   $("#btnLocate").addEventListener("click", initGps);
   initGps();
   // Gancho de teste/demonstração: injeta uma posição GPS sem rede.
-  window.AcordeDemo = {
+  window.WakeHereDemo = {
     setGps: (lat, lng, acc) => onGeoFix({ coords: { latitude: lat, longitude: lng, accuracy: acc || 10 } }),
     clearGps: () => onGeoError({ code: 0 }),
     state: state

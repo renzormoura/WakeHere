@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<title>AcordeAqui — Ícone</title>
+<title>WakeHere — Ícone</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -62,7 +62,7 @@
 </head>
 <body>
 
-<h2>AcordeAqui — Ícone final</h2>
+<h2>WakeHere — Ícone final</h2>
 
 <!-- ── PREVIEW GRANDE ── -->
 <div class="big-icon" id="bigIcon">
@@ -207,7 +207,7 @@
       <circle cx="668" cy="776" r="40" fill="#fff"/>
     </svg>
   </div>
-  <span style="font-size:14px;font-weight:600;color:#1c1c1e">AcordeAqui</span>
+  <span style="font-size:14px;font-weight:600;color:#1c1c1e">WakeHere</span>
 </div>
 
 <!-- ── EXPORTAR PNG ── -->
@@ -319,7 +319,7 @@ function exportPng(size) {
     URL.revokeObjectURL(url);
     const a = document.createElement('a');
     a.href = canvas.toDataURL('image/png');
-    a.download = `acordeaqui-icon-${size}.png`;
+    a.download = `wakehere-icon-${size}.png`;
     a.click();
   };
   img.src = url;
@@ -330,7 +330,7 @@ function exportSvg() {
   const blob = new Blob([svgSource], { type: 'image/svg+xml' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'acordeaqui-icon.svg';
+  a.download = 'wakehere-icon.svg';
   a.click();
 }
 </script>

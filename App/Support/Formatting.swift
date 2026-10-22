@@ -1,5 +1,5 @@
 import Foundation
-import AcordeAquiDomain
+import WakeHereDomain
 
 /// Formatação PT-BR compartilhada pela interface.
 enum Formatting {

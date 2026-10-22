@@ -1,5 +1,5 @@
 import MapKit
-import AcordeAquiDomain
+import WakeHereDomain
 
 /// **Adapter** — implementa `PlaceSearching` com MKLocalSearch.
 final class MapKitPlaceSearcher: PlaceSearching {

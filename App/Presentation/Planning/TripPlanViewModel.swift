@@ -1,6 +1,6 @@
 import SwiftUI
 import MapKit
-import AcordeAquiDomain
+import WakeHereDomain
 
 /// ViewModel da tela de planejamento (MVVM).
 @MainActor

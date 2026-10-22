@@ -11,9 +11,9 @@ APIs de sistema. Queremos testar esse núcleo **sem Mac e sem simulador**.
 
 Separar em:
 
-- `Packages/AcordeAquiDomain` — puro (apenas `Foundation`), com todas as
+- `Packages/WakeHereDomain` — puro (apenas `Foundation`), com todas as
   portas (protocolos) das fronteiras externas.
-- `Packages/AcordeAquiData` — persistência JSON atrás dos repositórios.
+- `Packages/WakeHereData` — persistência JSON atrás dos repositórios.
 - `App/` — alvo iOS: SwiftUI, adaptadores (MapKit/CoreLocation/UserNotifications)
   e `CompositionRoot`.
 

@@ -11,8 +11,8 @@ necessidade de testes automatizados sem dispositivo.
 
 - Portas `TripRepository`/`SettingsRepository` no domínio.
 - Implementação `JsonTripRepository`/`JsonSettingsRepository` no pacote
-  `AcordeAquiData`: arquivos `trips.json`/`settings.json` em
-  `Documentos/AcordeAqui/`, escrita atômica, acesso serializado por fila.
+  `WakeHereData`: arquivos `trips.json`/`settings.json` em
+  `Documentos/WakeHere/`, escrita atômica, acesso serializado por fila.
 - Regras polimórficas persistidas via `WakeUpRuleCodec` (discriminador + JSON interno).
 - Arquivo de settings ausente/corrompido ⇒ padrões; trips corrompidos ⇒ erro
   tipado (`PersistenceError.corruptedData`) e `save` se recupera.
@@ -27,6 +27,6 @@ necessidade de testes automatizados sem dispositivo.
 ## Alternativas rejeitadas
 
 - **SwiftData/CoreData:** acoplaria o domínio a framework Apple e quebraria
-  os testes no Windows; seria uma troca de `AcordeAquiData` no futuro sem
+  os testes no Windows; seria uma troca de `WakeHereData` no futuro sem
   tocar no domínio (a porta já existe).
 - **UserDefaults:** não serve para estruturas aninhadas com histórico.

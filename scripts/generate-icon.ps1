@@ -1,5 +1,5 @@
 # generate-icon.ps1
-# Gera o AppIcon 1024x1024 do AcordeAqui usando System.Drawing (.NET)
+# Gera o AppIcon 1024x1024 do WakeHere usando System.Drawing (.NET)
 # Lua crescente + ZZZ em cascata + pin de destino
 
 Add-Type -AssemblyName System.Drawing

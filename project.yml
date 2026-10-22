@@ -1,6 +1,6 @@
-name: AcordeAqui
+name: WakeHere
 options:
-  bundleIdPrefix: com.acordeaqui
+  bundleIdPrefix: com.wakehere
   deploymentTarget:
     iOS: "17.0"
   createIntermediateGroups: true
@@ -12,29 +12,29 @@ settings:
     CURRENT_PROJECT_VERSION: "1"
 
 packages:
-  AcordeAquiDomain:
-    path: Packages/AcordeAquiDomain
-  AcordeAquiData:
-    path: Packages/AcordeAquiData
+  WakeHereDomain:
+    path: Packages/WakeHereDomain
+  WakeHereData:
+    path: Packages/WakeHereData
 
 targets:
-  AcordeAqui:
+  WakeHere:
     type: application
     platform: iOS
     sources:
       - path: App
         excludes:
           - "Info.plist"
-          - "AcordeAqui.entitlements"
+          - "WakeHere.entitlements"
     dependencies:
-      - package: AcordeAquiDomain
-      - package: AcordeAquiData
+      - package: WakeHereDomain
+      - package: WakeHereData
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.acordeaqui.app
+        PRODUCT_BUNDLE_IDENTIFIER: com.wakehere.app
         INFOPLIST_FILE: App/Info.plist
         GENERATE_INFOPLIST_FILE: NO
-        CODE_SIGN_ENTITLEMENTS: App/AcordeAqui.entitlements
+        CODE_SIGN_ENTITLEMENTS: App/WakeHere.entitlements
         CODE_SIGN_STYLE: Automatic
         TARGETED_DEVICE_FAMILY: "1"
         ENABLE_PREVIEWS: YES
@@ -44,10 +44,10 @@ targets:
         # (para archive local no Mac, passe CODE_SIGNING_ALLOWED=NO)
 
 schemes:
-  AcordeAqui:
+  WakeHere:
     build:
       targets:
-        AcordeAqui: all
+        WakeHere: all
     run:
       config: Debug
     test:

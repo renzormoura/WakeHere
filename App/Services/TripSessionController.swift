@@ -1,6 +1,6 @@
 import Foundation
 import UIKit
-import AcordeAquiDomain
+import WakeHereDomain
 
 /// **Facade** — API única da viagem ativa para a interface.
 ///
@@ -129,7 +129,7 @@ final class TripSessionController: ObservableObject, Identifiable {
         // Mesmo que o app morra durante o snooze, a notificação toca no prazo.
         alarms.scheduleAlarm(
             at: deadline,
-            title: "AcordeAqui",
+            title: "WakeHere",
             body: "Snooze encerrado — confira se o ponto já está chegando!"
         )
     }
