@@ -21,8 +21,7 @@ jobs:
       - name: Generate Xcode project
         run: |
           xcodegen generate
-          echo "::notice::$(xcodebuild -version | tr "
-" " ") / xcodegen $(xcodegen --version)"
+          echo "::notice::$(xcodebuild -version | xargs) / xcodegen $(xcodegen --version)"
 
       - name: Build app (iOS Simulator)
         run: |
